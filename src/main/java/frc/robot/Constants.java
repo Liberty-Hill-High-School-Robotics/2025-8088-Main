@@ -19,9 +19,25 @@ import edu.wpi.first.math.util.Units;
  * <p>
  * It is advised to statically import this class (or one of its inner classes)
  * wherever the
- * constants are needed, to reduce verbosity.
+ * constants are needed, to reduce verbosity. //what the freak does verbosity mean xd
  */
+
 public final class Constants {
+  public static final class ColorConstants{
+    //RGB colors
+        //purple = 80, 45, 127
+        //gold = 255, 200, 46
+        //orange = 255, 145, 0
+        //blue = 0, 0, 255
+        //red = 255, 0, 0
+        //green = 0, 255, 0
+        public static int[] purple = new int[]{80, 3, 143}; 
+        public static int[] gold   = new int[]{255, 145, 0}; 
+        public static int[] orange = new int[]{255, 145, 0}; 
+        public static int[] blue   = new int[]{0, 0, 255}; 
+        public static int[] red    = new int[]{255, 0, 0}; 
+        public static int[] green  = new int[]{0, 255, 0};
+  }
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
