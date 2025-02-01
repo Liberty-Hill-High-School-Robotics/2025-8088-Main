@@ -1,41 +1,81 @@
 package frc.robot.subsystems;
 
-//all imports here
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.*;
+import java.util.List;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
+
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+//https://docs.photonvision.org/en/v2025.1.1/docs/programming/photonlib/getting-target-data.html
+//READ THIS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 public class Vision extends SubsystemBase {
 
-    //motors & variables here, define them and create any PIDs needed
-    /* ex:
-    private CANSparkMax barRotatorSparkMax;
-    private SparkLimitSwitch barReverseLimitSwitch;
-    public static RelativeEncoder barRotatorRelativeEncoder;
-    PIDController barPID = new PIDController(BarConstants.bP, BarConstants.bI, BarConstants.bD);
-    */
+    //make sure the name in quotes is EXACTLY the same as it is in PV
+    PhotonCamera LeftCamera = new PhotonCamera("LeftCamera");
+    PhotonCamera RightCamera = new PhotonCamera("RightCamera");
 
-    public LED(){
-        //config motor settings here
+    
+
+    public Vision(){
+        //Getting target data
+
+        //"A PhotonPipelineResult is a container that contains all information about currently detected targets from a PhotonCamera. 
+        //You can retrieve the latest pipeline result using the PhotonCamera instance."
+        var result = LeftCamera.getLatestResult();
+
+        // Check if the latest result has any targets.
+        boolean hasTargets = result.hasTargets();
 
         /*
-        ex:
-        barRotatorSparkMax = new CANSparkMax(CanIDs.barRotatorID, MotorType.kBrushless);
-        //barRotatorSparkMax.restoreFactoryDefaults();
-        barRotatorSparkMax.setInverted(true);
-        barRotatorSparkMax.setIdleMode(IdleMode.kBrake);
-        barRotatorSparkMax.setSmartCurrentLimit(40);
+         * you must always check if the result has a target via hasTargets()/HasTargets() before getting targets or else you may get a null pointer exception.
+         * What is a Photon Tracked Target?
+         * A tracked target contains information about each target from a pipeline result. This information includes yaw, pitch, area, and robot relative pose.
+         */
 
-        barReverseLimitSwitch = barRotatorSparkMax.getReverseLimitSwitch(Type.kNormallyOpen);
+        // Get a list of currently tracked targets.
+        List<PhotonTrackedTarget> targets = result.getTargets();
 
-        barRotatorSparkMax.enableSoftLimit(SoftLimitDirection.kForward, true);
-        barRotatorSparkMax.setSoftLimit(SoftLimitDirection.kForward, BarConstants.fLimit);
+        // Get the current best target.
+        PhotonTrackedTarget besttarget = result.getBestTarget();
 
-        barRotatorRelativeEncoder = barRotatorSparkMax.getEncoder();
-        */
+        /*
+         * double getYaw() = yaw of target in degrees (positive right)
+         * double getPitch() = pitch of target in degress (positive up)
+         * double getArea() = the area( how much of the camera feed the bounding box takes up) as a percent
+         * double[] getCorners() = the 4 corners of the miniumum bounding box rectangle
+         * Transform2d getCameraToTarget() = the camera to target transform, see 2d transform documentation
+         */
+
+         // Get information from target.
+        double yaw = besttarget.getYaw();
+        double pitch = besttarget.getPitch();
+        double area = besttarget.getArea();
+        double skew = besttarget.getSkew();
+
+        /*
+         * note:
+         * you can also get fiducial id, pose ambiguity, best camear to target, and alternate camera to target
+         * 
+         */
+        int targetID = besttarget.getFiducialId();
+        double poseAmbiguity = besttarget.getPoseAmbiguity();
+        Transform3d bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
+        Transform3d alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+
+        //------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------
+        //using target data
+
+        
+
+
     }
 
   

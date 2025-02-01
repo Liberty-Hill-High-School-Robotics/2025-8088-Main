@@ -54,6 +54,8 @@ public class RobotContainer {
   public final Algae m_algae = new Algae();
   public final Hopper m_hopper = new Hopper();
   public final GroundIntake m_groundIntake = new GroundIntake();
+  public final LED m_led = new LED();
+  public final Vision m_vision = new Vision();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
 
