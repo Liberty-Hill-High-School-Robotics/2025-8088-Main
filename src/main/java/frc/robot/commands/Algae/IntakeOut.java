@@ -1,5 +1,5 @@
-package frc.robot.commands.Coral;
-import frc.robot.subsystems.Coral;
+package frc.robot.commands.Algae;
+import frc.robot.subsystems.Algae;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj2.command.Command;
  * pedagogical purposes. Actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.InstantCommand}.
  */
-public class IntakeIn extends Command {
+public class IntakeOut extends Command {
   // The subsystem the command runs on
-  private final Coral m_coral;
+  private final Algae m_algae;
 
-  public IntakeIn(Coral subsystem) {
-    m_coral = subsystem;
-    addRequirements(m_coral);
+  public IntakeOut(Algae subsystem) {
+    m_algae = subsystem;
+    addRequirements(m_algae);
   }
 
   @Override
