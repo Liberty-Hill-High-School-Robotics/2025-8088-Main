@@ -1,32 +1,28 @@
 package frc.robot.subsystems;
 
-
+//all imports here
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.*;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkLimitSwitch;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.SparkLimitSwitch.Type;
 
 
 
-public class Bar extends SubsystemBase {
+public class GroundIntake extends SubsystemBase {
 
-    //motors & variables here
+    //motors & variables here, define them and create any PIDs needed
+    /* ex:
     private CANSparkMax barRotatorSparkMax;
     private SparkLimitSwitch barReverseLimitSwitch;
     public static RelativeEncoder barRotatorRelativeEncoder;
     PIDController barPID = new PIDController(BarConstants.bP, BarConstants.bI, BarConstants.bD);
+    */
 
-
-    public Bar(){
+    public GroundIntake(){
         //config motor settings here
+
+        /*
+        ex:
         barRotatorSparkMax = new CANSparkMax(CanIDs.barRotatorID, MotorType.kBrushless);
         //barRotatorSparkMax.restoreFactoryDefaults();
         barRotatorSparkMax.setInverted(true);
@@ -39,72 +35,34 @@ public class Bar extends SubsystemBase {
         barRotatorSparkMax.setSoftLimit(SoftLimitDirection.kForward, BarConstants.fLimit);
 
         barRotatorRelativeEncoder = barRotatorSparkMax.getEncoder();
+        */
     }
 
   
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-        SmartDashboard.putNumber("barRotatorRelativeEncoder", barRotatorRelativeEncoder.getPosition());
-        SmartDashboard.putBoolean("barAtReverseLimit",barAtReverseLimit());
-
-        if(barAtReverseLimit() == true){
-            barRotatorRestRelativeEncoder();
-        }
-
+        //This method will be called once per scheduler run
+        //Put smartdashboard stuff, check for limit switches
     }
 
     @Override
     public void simulationPeriodic() {
         // This method will be called once per scheduler run when in simulation
-        
-        
-
+        //Mostly used for debug and such
     }
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-    public void angleBar(double setpoint){
-        barRotatorSparkMax.set(barPID.calculate(barRotatorRelativeEncoder.getPosition(), setpoint));
+    // Should include run/stop/run back, etc.
+
+    //as well as check for limits and reset encoders,
+    //return true/false if limit is true, or encoder >= x value
+
+    public void ___(){
+        //motor.set(PID.calculate(position, setpoint));
+        //motor.set(number);
         
     }
-
-
-    public void barRotateForward(){
-        barRotatorSparkMax.set(MotorSpeeds.barRotatorSpeed);
-    }
-
-    public void barRotateBackward(){
-        barRotatorSparkMax.set(-MotorSpeeds.barRotatorSpeed);
-    }
-
-    public void barRotateStop(){
-        barRotatorSparkMax.set(0);
-    }
-
-    public boolean barAtReverseLimit(){
-    
-        return barReverseLimitSwitch.isPressed();
-    }
-
-    public boolean barAtRotateForwardLimit(){
-        if(barRotatorRelativeEncoder.getPosition() >= 22){
-            return true;
-        }else{
-            return false;
-        }
-        //return barRotatorSparkMax.isSoftLimitEnabled(SoftLimitDirection.kForward);
-    }
-
-    public void barRotatorRestRelativeEncoder(){
-        barRotatorRelativeEncoder.setPosition(0);
-    }
-
-    
-
-    
-
-
 
 }

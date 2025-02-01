@@ -24,14 +24,20 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.CanIDs.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import com.pathplanner.lib.auto.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+
+//Subsystem imports
+import frc.robot.subsystems.*;
+
+//Command imports
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,51 +48,96 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class RobotContainer {
   // The robot's subsystems
+  public final Elevator m_elevator = new Elevator();
+  public final Coral m_coral = new Coral();
+  public final Climber m_climber = new Climber();
+  public final Algae m_algae = new Algae();
+  public final Hopper m_hopper = new Hopper();
+  public final GroundIntake m_groundIntake = new GroundIntake();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
+
   //create an autonomous chooser
- // public final SendableChooser<Command> autoChooser;
+  public final SendableChooser<Command> autoChooser;
 
-
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  //Create the driver and operator controller. Please use CommandXboxController instead of XboxController
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
 
     //The container for the robot. Contains subsystems, OI devices, and commands.
-  public RobotContainer() {
-
-
+  public RobotContainer(){
     //--------------------Auton stuff-------------------
-
     //Create namedcommands for PathPlanner paths. Note which names you use, as they have to be exactly the same in PP
     //example here
     //NamedCommands.registerCommand("AutoIntake", new AutoIntakeTimeout(m_intake, m_storage, m_pivot, m_leds));
 
     //Pathplanner auto chooser
-    //autoChooser = AutoBuilder.buildAutoChooser();
-   // SmartDashboard.putData("Auto Mode", autoChooser); 
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Mode", autoChooser); 
 
     //Put the autons on the chooser and on SmartDashboard
     //example
     //SmartDashboard.putData("AmpPlayoff", new PathPlannerAuto("AmpPlayoff"));
 
-    //----------------------------------------------------------
+    //------------------------------------------------------------------------------------------
+    //----------------------------- Start of SmartDashboard Exports-----------------------------
+    //------------------------------------------------------------------------------------------
+
+    //------------------------------------- Command Exports ------------------------------------
+    //Algae Exports
+    
+
+    //Climber Exports
+    
+
+    //Coral Exports
+    
+
+    //DriveSubsytem Exports
+    
+
+    //Elevator Exports
+    
+
+    //GroundIntake Exports
+    
+
+    //Hopper Exports
+
+
+    //LEDs Exports
+
+    //------------------------------------- Other Exports ------------------------------------
+    //SemiAuto Commands
+
+
+    //Other
+
+
+    //------------------------------------------------------------------------------------------
+    //------------------------------ End of SmartDashboard Exports------------------------------
+    //------------------------------------------------------------------------------------------
 
 
     // Configure the button bindings
     configureButtonBindings();
 
     // Configure default commands
-    //if we want a boost mode needs to be added here
+    // The left stick controls translation of the robot.
+    // Turning is controlled by the X axis of the right stick.
+    //outputs are multiplied by a boolean controlled by a button on the driver controller
+    //makes it slower or faster depending on output of button
     m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(() -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true),
-            m_robotDrive));
+    new RunCommand(() -> {
+        var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : .8;
+        m_robotDrive.drive(
+          //inputs from joystick to drive system
+          -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio,
+          -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio,
+          -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+          true); },
+          m_robotDrive));
   }
 
   /**
@@ -99,10 +150,13 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    //add button bindings here
+    /*
+     * ex:
+     * final Trigger commandname = m_drivercontroller.button();
+     * commandname.toggleontrue(new commandname(m_subsystem(s)));
+     * 
+     */
   }
 
   /**
@@ -111,8 +165,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //return autoChooser.getSelected(); 
-    return null; 
+    return autoChooser.getSelected(); 
     //this allows for pathplanner to use auton stuff, rev provides an example but pathplanner is better
   }
 }

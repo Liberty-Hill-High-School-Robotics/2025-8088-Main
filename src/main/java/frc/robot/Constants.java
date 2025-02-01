@@ -23,6 +23,14 @@ import edu.wpi.first.math.util.Units;
  */
 
 public final class Constants {
+
+  public static final class CanIDs{
+  
+    //can IDs
+
+  }
+
+
   public static final class ColorConstants{
     //RGB colors
         //purple = 80, 45, 127
@@ -38,6 +46,8 @@ public final class Constants {
         public static int[] red    = new int[]{255, 0, 0}; 
         public static int[] green  = new int[]{0, 255, 0};
   }
+
+
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -75,6 +85,8 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
   }
 
+
+
   public static final class ModuleConstants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
@@ -92,10 +104,16 @@ public final class Constants {
         / kDrivingMotorReduction;
   }
 
+
+
   public static final class OIConstants {
+    //controller ports
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
   }
+
+
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
@@ -111,6 +129,7 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
+
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
