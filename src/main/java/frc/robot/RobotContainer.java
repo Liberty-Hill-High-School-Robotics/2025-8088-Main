@@ -45,7 +45,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   //create an autonomous chooser
-  public final SendableChooser<Command> autoChooser;
+ // public final SendableChooser<Command> autoChooser;
 
 
   // The driver's controller
@@ -63,8 +63,8 @@ public class RobotContainer {
     //NamedCommands.registerCommand("AutoIntake", new AutoIntakeTimeout(m_intake, m_storage, m_pivot, m_leds));
 
     //Pathplanner auto chooser
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Mode", autoChooser); 
+    //autoChooser = AutoBuilder.buildAutoChooser();
+   // SmartDashboard.putData("Auto Mode", autoChooser); 
 
     //Put the autons on the chooser and on SmartDashboard
     //example
@@ -111,7 +111,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();  
+    //return autoChooser.getSelected(); 
+    return null; 
     //this allows for pathplanner to use auton stuff, rev provides an example but pathplanner is better
   }
 }
