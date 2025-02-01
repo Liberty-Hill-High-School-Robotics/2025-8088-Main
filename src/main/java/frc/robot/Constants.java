@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -23,7 +25,7 @@ import edu.wpi.first.math.util.Units;
  */
 
 public final class Constants {
-
+  
   public static final class CanIDs{
     //can IDs
     public static final int GyroID = 9;
@@ -49,6 +51,9 @@ public final class Constants {
 
 
   public static final class DriveConstants {
+
+
+
     //TUNE THESE!!!
     public static final double tP = 0.1;
     public static final double tI = 0;
@@ -69,6 +74,15 @@ public final class Constants {
         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        
+        //same thing as above but used in the KINEMATICS class
+    public static final Translation2d[] Module_Info = {
+          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
+        };
+    
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
@@ -88,6 +102,7 @@ public final class Constants {
     public static final int kBRTurningCAN = 16;
 
     public static final boolean kGyroReversed = false;
+    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(Module_Info);
   }
 
 
