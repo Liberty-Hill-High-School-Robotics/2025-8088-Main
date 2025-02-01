@@ -25,8 +25,8 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
   public static final class CanIDs{
-  
     //can IDs
+    public static final int GyroID = 9;
 
   }
 
@@ -49,6 +49,11 @@ public final class Constants {
 
 
   public static final class DriveConstants {
+    //TUNE THESE!!!
+    public static final double tP = 0.1;
+    public static final double tI = 0;
+    public static final double tD = 0.02;
+
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
