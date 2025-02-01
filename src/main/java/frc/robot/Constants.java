@@ -6,7 +6,10 @@ package frc.robot;
 
 import com.pathplanner.lib.config.RobotConfig;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +28,13 @@ import edu.wpi.first.math.util.Units;
  */
 
 public final class Constants {
-  
+  public static final class visionData{
+
+  public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); 
+  }
+  //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+
   public static final class CanIDs{
     //can IDs
     public static final int GyroID = 9;
