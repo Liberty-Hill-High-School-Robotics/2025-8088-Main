@@ -7,21 +7,28 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import org.photonvision.PhotonUtils;
+
 import com.ctre.phoenix6.hardware.*;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -55,8 +62,9 @@ public class DriveSubsystem extends SubsystemBase {
   public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
   public CommandXboxController m_driverControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
-  //add a turning PID to manually control the turning of the robot
-  PIDController turningPID = new PIDController(DriveConstants.tP, DriveConstants.tI, DriveConstants.tD);
+  //add a turning PID to manually control the turning of the robot, and translation pid
+  PIDController turningPID = new PIDController(DriveConstants.rP, DriveConstants.rI, DriveConstants.rD);
+  PIDController TranslationPID = new PIDController(DriveConstants.tP, DriveConstants.tI, DriveConstants.tD);
 
 
   // Odometry class for tracking robot pose
@@ -245,5 +253,33 @@ public class DriveSubsystem extends SubsystemBase {
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
     setModuleStates(
       DriveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds));
+  }
+
+  public double turnPID(Pose2d targetPose, double setpoint){
+    //TUNE
+    double current = (targetPose.getX());
+    double output = (turningPID.calculate(current, setpoint));
+    return output;
+  }
+
+  public double driveDistancePID(Pose2d targetPose, double setpoint, Pose2d RobotPose){
+    //TUNE
+    double current = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
+    double output = TranslationPID.calculate(current, setpoint);
+    return output;
+  }
+
+  public void aimWhileMovingv2(double PIDValue) {
+    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
+                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed), PIDValue);
+    //apply swerve module states
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
+  }
+
+  public void turnChassis(double turnRate) {
+    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
+                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed), turnRate);
+    //apply swerve module states
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 }

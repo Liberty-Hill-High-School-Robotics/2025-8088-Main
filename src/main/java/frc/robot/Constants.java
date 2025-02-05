@@ -62,9 +62,13 @@ public final class Constants {
 
 
     //TUNE THESE!!!
+    public static final double rP = 0.1;
+    public static final double rI = 0;
+    public static final double rD = 0;
     public static final double tP = 0.1;
     public static final double tI = 0;
-    public static final double tD = 0.02;
+    public static final double tD = 0;
+
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
