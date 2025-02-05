@@ -22,12 +22,7 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.swerve.*;
-import com.pathplanner.lib.pathfinding.*;
-import com.pathplanner.lib.trajectory.*;
-
 import com.ctre.phoenix6.hardware.*;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;

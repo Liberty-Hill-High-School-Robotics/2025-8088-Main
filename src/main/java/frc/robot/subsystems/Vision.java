@@ -31,6 +31,7 @@ public class Vision extends SubsystemBase {
     //make sure the name in quotes is EXACTLY the same as it is in PV
     PhotonCamera LeftCamera = new PhotonCamera("LeftCamera");
     PhotonCamera RightCamera = new PhotonCamera("RightCamera");
+    Pose2d RobotPose;
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
@@ -103,7 +104,7 @@ public class Vision extends SubsystemBase {
         */
 
         //calculate distance given pose
-        double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+        double distanceToTarget = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
 
         // Calculate a translation from the camera to the target.
         //needs distance
@@ -111,7 +112,7 @@ public class Vision extends SubsystemBase {
         distanceToTarget, Rotation2d.fromDegrees(-besttarget.getYaw()));
 
         //get yaw towards target, i.e. hub from 2022 rapid react
-        Rotation2d targetYaw = PhotonUtils.getYawToPose(robotPose, targetPose);
+        Rotation2d targetYaw = PhotonUtils.getYawToPose(RobotPose, targetPose);
 
         // Construct PhotonPoseEstimator
         PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, visionData.robotToCamLeft);
