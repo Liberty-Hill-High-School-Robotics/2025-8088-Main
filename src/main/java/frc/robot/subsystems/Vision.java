@@ -29,13 +29,13 @@ import frc.robot.Constants.visionData;
 public class Vision extends SubsystemBase {
 
     //make sure the name in quotes is EXACTLY the same as it is in PV
-    PhotonCamera LeftCamera = new PhotonCamera("LeftCamera");
-    PhotonCamera RightCamera = new PhotonCamera("RightCamera");
+    PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
+    PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
     Pose2d RobotPose;
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-    
+    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, visionData.robotToCamLeft);    
 
     public Vision(){
         //Getting target data
@@ -115,14 +115,12 @@ public class Vision extends SubsystemBase {
         Rotation2d targetYaw = PhotonUtils.getYawToPose(RobotPose, targetPose);
 
         // Construct PhotonPoseEstimator
-        PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, visionData.robotToCamLeft);
         //photon vision docs says this needs the camera as an argument, but this doesn't want it, take note of this
         //addvisionmeasurement...?
 
-        public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
-            photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-            return photonPoseEstimator.update(result);
-    }
+        
+
+
 
         
 
@@ -154,6 +152,12 @@ public class Vision extends SubsystemBase {
         //motor.set(PID.calculate(position, setpoint));
         //motor.set(number);
         
+    }
+
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
+        
+        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+        return photonPoseEstimator.update(result);
     }
 
 }

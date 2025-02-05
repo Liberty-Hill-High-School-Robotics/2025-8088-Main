@@ -28,6 +28,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class DriveSubsystem extends SubsystemBase {
+  RobotConfig driveConfig;
+
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFLDrivingCAN,
@@ -71,9 +73,8 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
-    RobotConfig config;
     try{
-      config = RobotConfig.fromGUISettings();
+      driveConfig = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
@@ -92,7 +93,7 @@ public class DriveSubsystem extends SubsystemBase {
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
         ),
-        config, // The robot configuration
+        driveConfig, // The robot configuration
         () -> {
         // Boolean supplier that controls when the path will be mirrored for the red alliance
         // This will flip the path being followed to the red side of the field.
