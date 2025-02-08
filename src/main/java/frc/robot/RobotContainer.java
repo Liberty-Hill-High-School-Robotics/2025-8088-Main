@@ -31,11 +31,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import com.pathplanner.lib.auto.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 
 //Subsystem imports
 import frc.robot.subsystems.*;
-
+import frc.robot.commands.Algae.*;
+import frc.robot.commands.Climber.*;
+import frc.robot.commands.Coral.*;
 //Command imports
+import frc.robot.commands.Drive.*;
+import frc.robot.commands.Elevator.*;
+import frc.robot.commands.Vision.*;
 
 
 /*
@@ -55,7 +62,7 @@ public class RobotContainer {
   public final GroundIntake m_groundIntake = new GroundIntake();
   public final LED m_led = new LED();
   public final Vision m_vision = new Vision();
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_drivesubsystem = new DriveSubsystem();
 
 
   //create an autonomous chooser
@@ -96,7 +103,11 @@ public class RobotContainer {
     
 
     //DriveSubsytem Exports
-    
+    SmartDashboard.putData("RunPIDx", new LeftRightPID(m_drivesubsystem, m_vision.getYaw()));
+    SmartDashboard.putData("TESTRUN", new TESTRUN(m_drivesubsystem));
+    SmartDashboard.putNumber("YAWcommand", m_vision.getYaw());
+    SmartDashboard.putNumber("YawValue", m_vision.yaw);
+
 
     //Elevator Exports
     
@@ -129,16 +140,16 @@ public class RobotContainer {
     // Turning is controlled by the X axis of the right stick.
     //outputs are multiplied by a boolean controlled by a button on the driver controller
     //makes it slower or faster depending on output of button
-    m_robotDrive.setDefaultCommand(
+    m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
         var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : .8;
-        m_robotDrive.drive(
+        m_drivesubsystem.drive(
           //inputs from joystick to drive system
           -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio,
           -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio,
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
           false); },
-          m_robotDrive));
+          m_drivesubsystem));
   }
 
   /**
@@ -156,8 +167,10 @@ public class RobotContainer {
      * ex:
      * final Trigger commandname = m_drivercontroller.button();
      * commandname.toggleontrue(new commandname(m_subsystem(s)));
-     * 
      */
+
+     final Trigger AlignXButton = m_driverController.b();
+     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem, m_vision.getYaw()));
   }
 
   /**

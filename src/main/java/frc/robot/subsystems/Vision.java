@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import java.util.List;
 import java.util.Optional;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.visionData;
 
@@ -31,7 +34,17 @@ public class Vision extends SubsystemBase {
     //make sure the name in quotes is EXACTLY the same as it is in PV
     PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
-    Pose2d RobotPose;
+    public Pose2d RobotPose;
+    public Pose2d targetPose;
+    public double yaw;
+    public double pitch;
+    public double area;
+    public double skew;
+
+    public int targetID;
+    public double poseAmbiguity;
+    public Transform3d bestCameraToTarget;
+    public Transform3d alternateCameraToTarget;
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
@@ -41,11 +54,7 @@ public class Vision extends SubsystemBase {
         //Getting target data
 
         //"A PhotonPipelineResult is a container that contains all information about currently detected targets from a PhotonCamera. 
-        //You can retrieve the latest pipeline result using the PhotonCamera instance."
-        var result = LeftCamera.getLatestResult();
-
-        // Check if the latest result has any targets.
-        boolean hasTargets = result.hasTargets();
+        
 
         /*
          * you must always check if the result has a target via hasTargets()/HasTargets() before getting targets or else you may get a null pointer exception.
@@ -53,11 +62,7 @@ public class Vision extends SubsystemBase {
          * A tracked target contains information about each target from a pipeline result. This information includes yaw, pitch, area, and robot relative pose.
          */
 
-        // Get a list of currently tracked targets.
-        List<PhotonTrackedTarget> targets = result.getTargets();
-
-        // Get the current best target.
-        PhotonTrackedTarget besttarget = result.getBestTarget();
+        
 
         /*
          * double getYaw() = yaw of target in degrees (positive right)
@@ -68,20 +73,15 @@ public class Vision extends SubsystemBase {
          */
 
          // Get information from target.
-        double yaw = besttarget.getYaw();
-        double pitch = besttarget.getPitch();
-        double area = besttarget.getArea();
-        double skew = besttarget.getSkew();
+        
+        
 
         /*
          * note:
          * you can also get fiducial id, pose ambiguity, best camear to target, and alternate camera to target
          * 
          */
-        int targetID = besttarget.getFiducialId();
-        double poseAmbiguity = besttarget.getPoseAmbiguity();
-        Transform3d bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
-        Transform3d alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+        
 
         //------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------
@@ -89,10 +89,7 @@ public class Vision extends SubsystemBase {
         //using target data
 
         // Calculate robot's field relative pose (for use in updating robot pose)
-        if (aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).isPresent()) {
-        Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
-            besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
-        }
+
 
         /*
         //traditional way of caluclating pose:
@@ -103,16 +100,13 @@ public class Vision extends SubsystemBase {
         kCameraHeight, kTargetHeight, kCameraPitch, kTargetPitch, Rotation2d.fromDegrees(-besttarget.getYaw()), gyro.getRotation2d(), targetPose, visionData.robotToCamLeft);
         */
 
-        //calculate distance given pose
-        double distanceToTarget = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
+        
 
-        // Calculate a translation from the camera to the target.
-        //needs distance
-        Translation2d translation = PhotonUtils.estimateCameraToTargetTranslation(
-        distanceToTarget, Rotation2d.fromDegrees(-besttarget.getYaw()));
+        
+        
 
         //get yaw towards target, i.e. hub from 2022 rapid react
-        Rotation2d targetYaw = PhotonUtils.getYawToPose(RobotPose, targetPose);
+        //Rotation2d targetYaw = PhotonUtils.getYawToPose(RobotPose, targetPose);
 
         // Construct PhotonPoseEstimator
         //photon vision docs says this needs the camera as an argument, but this doesn't want it, take note of this
@@ -132,7 +126,53 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         //This method will be called once per scheduler run
-        //Put smartdashboard stuff, check for limit switches
+        //Put smartdashboard stuff, check for limit switches, etc
+        //You can retrieve the latest pipeline result using the PhotonCamera instance."
+        var result = LeftCamera.getLatestResult();
+
+        // Check if the latest result has any targets.
+        boolean hasTargets = result.hasTargets();
+
+        // Get a list of currently tracked targets.
+        List<PhotonTrackedTarget> targets = result.getTargets();
+
+        // Get the current best target.
+
+        if(result.hasTargets()){
+            PhotonTrackedTarget besttarget = result.getBestTarget();
+            yaw = besttarget.getYaw();
+            pitch = besttarget.getPitch();
+            area = besttarget.getArea();
+            skew = besttarget.getSkew();
+
+            targetID = besttarget.getFiducialId();
+            poseAmbiguity = besttarget.getPoseAmbiguity();
+            bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
+            alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+            //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
+            //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
+        }
+
+        //calculate distance given pose
+        //double distanceToTarget = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
+
+        // Calculate a translation from the camera to the target.
+        //needs distance
+        //Translation2d translation = PhotonUtils.estimateCameraToTargetTranslation(
+        //distanceToTarget, Rotation2d.fromDegrees(-besttarget.getYaw()));
+
+
+        //-------------------------------------------------
+        //smartdashboardstuff
+
+        SmartDashboard.putNumber("TargetYaw", yaw);
+        SmartDashboard.putNumber("TargetPitch", pitch);
+        SmartDashboard.putNumber("TargetArea", area);
+        SmartDashboard.putNumber("TargetSkew", skew);
+        SmartDashboard.putNumber("TargetID", targetID);
+        SmartDashboard.putNumber("TargetPoseAmbiguity", poseAmbiguity);
+
+        
     }
 
     @Override
@@ -148,16 +188,28 @@ public class Vision extends SubsystemBase {
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
 
-    public void ___(){
-        //motor.set(PID.calculate(position, setpoint));
-        //motor.set(number);
-        
+    public double getYaw(){
+        var value = LeftCamera.getLatestResult();
+        double yaw = value.getBestTarget().yaw;
+        return yaw;
+    }
+    public double getPitch(){
+        return pitch;
+    }
+    public double getArea(){
+        return area;
+    }
+    public double getSkew(){
+        return skew;
+    }
+    public int getID(){
+        return targetID;
     }
 
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
+    //public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
         
-        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-        return photonPoseEstimator.update(result);
-    }
+       // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+       // return photonPoseEstimator.update(result);
+   // }
 
 }

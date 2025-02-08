@@ -26,6 +26,7 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
+import frc.robot.commands.Vision.*;
 
 import org.photonvision.PhotonUtils;
 
@@ -269,17 +270,28 @@ public class DriveSubsystem extends SubsystemBase {
     return output;
   }
 
-  public void aimWhileMovingv2(double PIDValue) {
-    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed), PIDValue);
-    //apply swerve module states
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
-  }
-
   public void turnChassis(double turnRate) {
     var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
                                    (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed), turnRate);
     //apply swerve module states
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
+  }
+
+
+
+  public void leftrightPIDcontrol(double current){
+    double calc = TranslationPID.calculate(current, 0);
+    SmartDashboard.putNumber("setpoint", calc);
+    SmartDashboard.putNumber("current", current);
+
+    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
+                                   (calc), -MathUtil.applyDeadband(m_driverControllerLocal.getRightX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed);
+    //apply these speeds
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
+  }
+
+  public void TESTRUN(){
+    var speeds = new ChassisSpeeds(1, 1, 0);
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 }
