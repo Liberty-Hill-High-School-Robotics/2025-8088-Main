@@ -137,7 +137,7 @@ public class RobotContainer {
           -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio,
           -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio,
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-          true); },
+          false); },
           m_robotDrive));
   }
 
