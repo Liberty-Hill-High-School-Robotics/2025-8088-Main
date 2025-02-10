@@ -281,8 +281,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void leftrightPIDcontrol(double current){
     double calc = TranslationPID.calculate(current, 0);
-    SmartDashboard.putNumber("setpoint", calc);
-    SmartDashboard.putNumber("current", current);
 
     var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
                                    (calc), -MathUtil.applyDeadband(m_driverControllerLocal.getRightX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed);
