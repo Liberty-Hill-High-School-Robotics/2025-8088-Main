@@ -151,6 +151,10 @@ public class Vision extends SubsystemBase {
             alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
             //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
             //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
+
+            var value = LeftCamera.getLatestResult();
+            double value2 = value.getBestTarget().yaw;
+            SmartDashboard.putNumber("SMARTDASHBOARDYAW", value2);
         }
 
         //calculate distance given pose
