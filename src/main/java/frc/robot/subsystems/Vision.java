@@ -2,25 +2,20 @@ package frc.robot.subsystems;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import javax.naming.spi.DirStateFactory.Result;
 
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.targeting.TargetCorner;
+
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.visionData;
@@ -128,7 +123,8 @@ public class Vision extends SubsystemBase {
         //This method will be called once per scheduler run
         //Put smartdashboard stuff, check for limit switches, etc
         //You can retrieve the latest pipeline result using the PhotonCamera instance."
-        var result = LeftCamera.getLatestResult();
+        if(LeftCamera.isConnected()){
+            var result = LeftCamera.getLatestResult();
 
         // Check if the latest result has any targets.
         boolean hasTargets = result.hasTargets();
@@ -137,25 +133,27 @@ public class Vision extends SubsystemBase {
         List<PhotonTrackedTarget> targets = result.getTargets();
 
         // Get the current best target.
+            if(result.hasTargets()){
+                PhotonTrackedTarget besttarget = result.getBestTarget();
+                yaw = besttarget.getYaw();
+                pitch = besttarget.getPitch();
+                area = besttarget.getArea();
+                skew = besttarget.getSkew();
 
-        if(result.hasTargets()){
-            PhotonTrackedTarget besttarget = result.getBestTarget();
-            yaw = besttarget.getYaw();
-            pitch = besttarget.getPitch();
-            area = besttarget.getArea();
-            skew = besttarget.getSkew();
+                targetID = besttarget.getFiducialId();
+                poseAmbiguity = besttarget.getPoseAmbiguity();
+                bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
+                alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+                //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
+                //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
 
-            targetID = besttarget.getFiducialId();
-            poseAmbiguity = besttarget.getPoseAmbiguity();
-            bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
-            alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
-            //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
-            //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
+                var value = LeftCamera.getLatestResult();
+                double value2 = value.getBestTarget().yaw;
+                SmartDashboard.putNumber("SMARTDASHBOARDYAW", value2); //set zero if value2 does not exist //TODO:
+            }
 
-            var value = LeftCamera.getLatestResult();
-            double value2 = value.getBestTarget().yaw;
-            SmartDashboard.putNumber("SMARTDASHBOARDYAW", value2);
         }
+        
 
         //calculate distance given pose
         //double distanceToTarget = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
@@ -192,20 +190,46 @@ public class Vision extends SubsystemBase {
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
 
-    public double getYaw(){
-        var value = LeftCamera.getLatestResult();
-        double yaw = value.getBestTarget().yaw;
-        return yaw;
+    public Double getYaw(){
+        if(LeftCamera.isConnected() || RightCamera.isConnected()){
+            var value = LeftCamera.getLatestResult();
+            double yaw = value.getBestTarget().yaw;
+            return yaw;
+        }
+        return null;
     }
-    public double getPitch(){
-        return pitch;
+
+
+    public Double getPitch(String camera){
+        if(LeftCamera.isConnected() || RightCamera.isConnected()){
+            var value = LeftCamera.getLatestResult();
+            double yaw = value.getBestTarget().pitch;
+            return yaw;
+        }
+        return null;
     }
-    public double getArea(){
-        return area;
+
+
+    public Double getArea(String camera){
+        if(LeftCamera.isConnected() || RightCamera.isConnected()){
+            var value = LeftCamera.getLatestResult();
+            double yaw = value.getBestTarget().area;
+            return yaw;
+        }
+        return null;
     }
-    public double getSkew(){
-        return skew;
+
+
+    public Double getSkew(String camera){
+        if(LeftCamera.isConnected() || RightCamera.isConnected()){
+            var value = LeftCamera.getLatestResult();
+            double yaw = value.getBestTarget().skew;
+            return yaw;
+        }
+        return null;
     }
+
+
     public int getID(){
         return targetID;
     }

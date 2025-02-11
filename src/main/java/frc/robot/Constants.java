@@ -35,6 +35,7 @@ public final class Constants {
 
   public static final class CanIDs{
     //can IDs
+    public static final int BlinkinPWMPort = 0;
     public static final int GyroID = 9;
 
   }

@@ -22,6 +22,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 package frc.robot;
 
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
@@ -30,19 +31,18 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import com.pathplanner.lib.auto.*;
+import com.revrobotics.ColorSensorV3.LEDCurrent;
+
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 //Subsystem imports
 import frc.robot.subsystems.*;
-import frc.robot.commands.Algae.*;
-import frc.robot.commands.Climber.*;
-import frc.robot.commands.Coral.*;
 //Command imports
 import frc.robot.commands.Drive.*;
-import frc.robot.commands.Elevator.*;
-import frc.robot.commands.Vision.*;
+import frc.robot.commands.Vision_LEDS.SetLEDPattern;
+
 
 
 /*
@@ -103,9 +103,7 @@ public class RobotContainer {
     
 
     //DriveSubsytem Exports
-    SmartDashboard.putData("RunPIDx", new LeftRightPID(m_drivesubsystem, m_vision.getYaw()));
     SmartDashboard.putData("TESTRUN", new TESTRUN(m_drivesubsystem));
-    SmartDashboard.putNumber("YAWcommand", m_vision.getYaw());
     SmartDashboard.putNumber("YawValue", m_vision.yaw);
 
 
@@ -119,6 +117,7 @@ public class RobotContainer {
 
 
     //LEDs Exports
+    SmartDashboard.putData("SETLED", new SetLEDPattern(m_led, .7));
 
     //------------------------------------- Other Exports ------------------------------------
     //SemiAuto Commands
