@@ -88,6 +88,12 @@
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 3.0,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {
