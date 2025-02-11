@@ -145,7 +145,6 @@ public class LED extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("BlinkinPattern", m_blinkin.get());
-        m_blinkin.set(.57);
     }
 
     @Override
@@ -159,7 +158,7 @@ public class LED extends SubsystemBase {
     * @param pattern Desired LED light pattern
     */
     public void setPattern(double pattern) {
-        m_blinkin.set(0.01);
+        m_blinkin.set(pattern);
     }
 
 }

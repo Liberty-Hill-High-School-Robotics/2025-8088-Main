@@ -10,11 +10,11 @@ import frc.robot.subsystems.DriveSubsystem;
 public class LeftRightPID extends Command {
   // The subsystem the command runs on
   private final DriveSubsystem m_DriveSubsystem;
-  double current;
+  double localvalue;
 
   public LeftRightPID(DriveSubsystem subsystem, double current) {
     m_DriveSubsystem = subsystem;
-    current = this.current;
+    localvalue = current;
     addRequirements(m_DriveSubsystem);
   }
 
@@ -25,7 +25,7 @@ public class LeftRightPID extends Command {
 
   @Override
   public void execute(){
-    m_DriveSubsystem.leftrightPIDcontrol(current);
+    m_DriveSubsystem.leftrightPIDcontrol(localvalue);
   }
 
   @Override
