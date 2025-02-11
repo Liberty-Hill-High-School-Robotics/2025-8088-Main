@@ -66,8 +66,8 @@ public final class Constants {
     public static final double rP = 0.1;
     public static final double rI = 0;
     public static final double rD = 0;
-    public static final double tP = 0.1;
-    public static final double tI = 0.05;
+    public static final double tP = 0.025;
+    public static final double tI = 0;
     public static final double tD = 0;
 
 
