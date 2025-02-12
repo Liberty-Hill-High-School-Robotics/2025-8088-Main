@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Bottom cycle 1"
+            "pathName": "Back Start"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottom cycle 2"
+            "pathName": "Back cycle 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottom cycle 3"
+            "pathName": "Back cycle 3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Bottom cycle 4"
+            "pathName": "Back cycle 4"
           }
         }
       ]
