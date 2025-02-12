@@ -29,7 +29,13 @@ public final class Constants {
   public static final class visionData{
 
   public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33, 0.203, 0.178), new Rotation3d(0,0,0));
-  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33, -0.203, 0.178), new Rotation3d(0,0,0)); 
+  public static final double leftCamHeight = robotToCamLeft.getZ();
+  public static final Rotation3d leftCamAngle = robotToCamLeft.getRotation();
+  
+  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33, -0.203, 0.178), new Rotation3d(0,0,0));
+  public static final double rightCamHeight = robotToCamRight.getZ();
+  public static final Rotation3d rightCamAngle = robotToCamRight.getRotation();
+
   }
   //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 

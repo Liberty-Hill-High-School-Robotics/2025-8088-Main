@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meter;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -15,6 +17,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,7 +38,10 @@ public class Vision extends SubsystemBase {
     public double pitch;
     public double area;
     public double skew;
+    public double distance;
 
+    public Optional<Pose3d> targetpose;
+    public double targetheight;
     public int targetID;
     public double poseAmbiguity;
     public Transform3d bestCameraToTarget;
@@ -123,14 +129,17 @@ public class Vision extends SubsystemBase {
         //This method will be called once per scheduler run
         //Put smartdashboard stuff, check for limit switches, etc
         //You can retrieve the latest pipeline result using the PhotonCamera instance."
+        //TODO: make stereo vision work?!?!
+        //maybe just use one camera or what idk :sob:
+    
         if(LeftCamera.isConnected()){
             var result = LeftCamera.getLatestResult();
 
         // Check if the latest result has any targets.
-        boolean hasTargets = result.hasTargets();
+        //boolean hasTargets = result.hasTargets();
 
         // Get a list of currently tracked targets.
-        List<PhotonTrackedTarget> targets = result.getTargets();
+        //List<PhotonTrackedTarget> targets = result.getTargets();
 
         // Get the current best target.
             if(result.hasTargets()){
@@ -141,11 +150,18 @@ public class Vision extends SubsystemBase {
                 skew = besttarget.getSkew();
 
                 targetID = besttarget.getFiducialId();
+                targetpose = aprilTagFieldLayout.getTagPose(targetID);
+                targetheight = targetpose.get().getMeasureZ().abs(Meter);
                 poseAmbiguity = besttarget.getPoseAmbiguity();
                 bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
                 alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
                 //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
                 //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
+                //distance equation:
+                //distance = (targetheight - cameraheight) / tan(cameraangle + Ty)
+                //THIS IS DISTANCE IN METERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                distance = (targetheight - visionData.leftCamHeight) / Math.tan(visionData.leftCamAngle.getAngle() + yaw);
+
 
                 var value = LeftCamera.getLatestResult();
                 double value2 = value.getBestTarget().yaw;
