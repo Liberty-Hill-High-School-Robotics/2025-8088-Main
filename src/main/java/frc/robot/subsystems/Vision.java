@@ -165,7 +165,7 @@ public class Vision extends SubsystemBase {
 
                 var value = LeftCamera.getLatestResult();
                 double value2 = value.getBestTarget().yaw;
-                SmartDashboard.putNumber("SMARTDASHBOARDYAW", value2); //set zero if value2 does not exist //TODO:
+                SmartDashboard.putNumber("SDYaw", value2); //set zero if value2 does not exist //TODO:
             }
 
         }
