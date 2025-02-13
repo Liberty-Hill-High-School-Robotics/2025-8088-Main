@@ -18,19 +18,22 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.hardware.*;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import frc.robot.subsystems.Vision;
 
 public class DriveSubsystem extends SubsystemBase {
   RobotConfig driveConfig;
@@ -78,7 +81,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-
     try{
       driveConfig = RobotConfig.fromGUISettings();
     } catch (Exception e) {
@@ -117,6 +119,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
@@ -125,7 +128,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
-        });
+        }
+        //,visionpose here
+        //NEED TO GET POSE2D FROM POSE ESTIMATOR IN VISION SUBSYSTEM
+        );
   }
 
   /**
@@ -278,9 +284,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void leftrightPIDcontrol(double current){
     double calc = TranslationPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
+    double calcD = TranslationPID.calculate(SmartDashboard.getNumber("SDDistance", 0), 15);
+    //double calcR = turningPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
 
-    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (calc), -MathUtil.applyDeadband(m_driverControllerLocal.getRightX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed);
+    var speeds = new ChassisSpeeds(calcD, calc, 0);
     //apply these speeds
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }

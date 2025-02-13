@@ -134,8 +134,8 @@ public class LED extends SubsystemBase {
     };
 
     private static Spark m_blinkin;
-    private static BlinkinPattern m_currentPattern;
 
+    
     public LED(){
         m_blinkin = new Spark(CanIDs.BlinkinPWMPort);
     }

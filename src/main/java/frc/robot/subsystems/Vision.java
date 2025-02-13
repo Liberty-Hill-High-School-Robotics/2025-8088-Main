@@ -2,17 +2,15 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
 
-import javax.naming.spi.DirStateFactory.Result;
-
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -21,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.visionData;
 
 //https://docs.photonvision.org/en/v2025.1.1/docs/programming/photonlib/getting-target-data.html
@@ -32,13 +31,15 @@ public class Vision extends SubsystemBase {
     //make sure the name in quotes is EXACTLY the same as it is in PV
     PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
-    public Pose2d RobotPose;
+    public Optional<EstimatedRobotPose> robotPose;
     public Pose2d targetPose;
     public double yaw;
     public double pitch;
     public double area;
     public double skew;
     public double distance;
+    public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
+
 
     public Optional<Pose3d> targetpose;
     public double targetheight;
@@ -49,7 +50,12 @@ public class Vision extends SubsystemBase {
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, visionData.robotToCamLeft);    
+    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, visionData.robotToCamLeft);   
+
+    
+    
+
+    
 
     public Vision(){
         //Getting target data
@@ -89,7 +95,6 @@ public class Vision extends SubsystemBase {
         //------------------------------------------------------------------------------------------------------
         //using target data
 
-        // Calculate robot's field relative pose (for use in updating robot pose)
 
 
         /*
@@ -130,7 +135,7 @@ public class Vision extends SubsystemBase {
         //Put smartdashboard stuff, check for limit switches, etc
         //You can retrieve the latest pipeline result using the PhotonCamera instance."
         //TODO: make stereo vision work?!?!
-        //maybe just use one camera or what idk :sob:
+        //maybe just use one camera or what idk :sob:    
     
         if(LeftCamera.isConnected()){
             var result = LeftCamera.getLatestResult();
@@ -157,18 +162,36 @@ public class Vision extends SubsystemBase {
                 alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
                 //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
                 //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
+                /*
                 //distance equation:
                 //distance = (targetheight - cameraheight) / tan(cameraangle + Ty)
                 //THIS IS DISTANCE IN METERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                distance = (targetheight - visionData.leftCamHeight) / Math.tan(visionData.leftCamAngle.getAngle() + yaw);
-
+                distance = (targetheight - visionData.leftCamHeight) / Math.tan((visionData.leftCamAngle.getAngle() + pitch) * (Math.PI/180));
+                distance = Math.sqrt(Math.pow(distance, 2)); //make sure distance is always positive
+                //double distance = (ShooterConstants.ApTagHeight - ShooterConstants.CamHeight) / Math.tan((ShooterConstants.CamAngle + (y)) * (Math.PI/180));
+                */
 
                 var value = LeftCamera.getLatestResult();
                 double value2 = value.getBestTarget().yaw;
-                SmartDashboard.putNumber("SDYaw", value2); //set zero if value2 does not exist //TODO:
-            }
 
+                SmartDashboard.putNumber("SDYaw", value2); //set zero if value2 does not exist //TODO:
+                SmartDashboard.putNumber("SDDistance", distance); //set zero if value2 does not exist //TODO
+
+                
+                photonPoseEstimator.update(LeftCamera.getLatestResult());
+                robotPose = photonPoseEstimator.update(LeftCamera.getLatestResult());
+                
+
+
+                if(robotPose.isPresent()){
+                    SmartDashboard.putNumber("AAAAAAAAAAAAAAAAAAAA", robotPose.get().timestampSeconds);
+                    SmartDashboard.putNumber("AAAAAAAAAAAAA2222AAAAAAA", LeftCamera.getLatestResult().getBestTarget().yaw);
+                }
+                
+            }
         }
+
+        
         
 
         //calculate distance given pose
@@ -189,8 +212,6 @@ public class Vision extends SubsystemBase {
         SmartDashboard.putNumber("TargetSkew", skew);
         SmartDashboard.putNumber("TargetID", targetID);
         SmartDashboard.putNumber("TargetPoseAmbiguity", poseAmbiguity);
-
-        
     }
 
     @Override
@@ -248,6 +269,14 @@ public class Vision extends SubsystemBase {
 
     public int getID(){
         return targetID;
+    }
+
+    public Pose2d getPoseVision(){
+        return photonPoseEstimator.update(LeftCamera.getLatestResult()).get().estimatedPose.toPose2d();
+    }
+
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+        return photonPoseEstimator.update(LeftCamera.getLatestResult());
     }
 
     //public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
