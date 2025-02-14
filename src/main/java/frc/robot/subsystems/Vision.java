@@ -31,6 +31,8 @@ public class Vision extends SubsystemBase {
     //make sure the name in quotes is EXACTLY the same as it is in PV
     PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
+
+
     public Optional<EstimatedRobotPose> robotPose;
     public Pose2d targetPose;
     public double yaw;
@@ -47,6 +49,8 @@ public class Vision extends SubsystemBase {
     public double poseAmbiguity;
     public Transform3d bestCameraToTarget;
     public Transform3d alternateCameraToTarget;
+
+
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
@@ -160,6 +164,7 @@ public class Vision extends SubsystemBase {
                 poseAmbiguity = besttarget.getPoseAmbiguity();
                 bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
                 alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+
                 //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
                 //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
                 /*
@@ -171,23 +176,24 @@ public class Vision extends SubsystemBase {
                 //double distance = (ShooterConstants.ApTagHeight - ShooterConstants.CamHeight) / Math.tan((ShooterConstants.CamAngle + (y)) * (Math.PI/180));
                 */
 
-                var value = LeftCamera.getLatestResult();
-                double value2 = value.getBestTarget().yaw;
 
-                SmartDashboard.putNumber("SDYaw", value2); //set zero if value2 does not exist //TODO:
-                SmartDashboard.putNumber("SDDistance", distance); //set zero if value2 does not exist //TODO
-
-                
-                photonPoseEstimator.update(LeftCamera.getLatestResult());
-                robotPose = photonPoseEstimator.update(LeftCamera.getLatestResult());
-                
+                SmartDashboard.putNumber("SDYaw", yaw); //set zero if value2 does not exist //TODO:
 
 
-                if(robotPose.isPresent()){
-                    SmartDashboard.putNumber("AAAAAAAAAAAAAAAAAAAA", robotPose.get().timestampSeconds);
-                    SmartDashboard.putNumber("AAAAAAAAAAAAA2222AAAAAAA", LeftCamera.getLatestResult().getBestTarget().yaw);
+                if(getPoseVision().isPresent()){
+                    robotPose = getPoseVision();
+                    photonPoseEstimator.update(LeftCamera.getLatestResult());
+                    SmartDashboard.putNumber("random", Math.random());
+                    SmartDashboard.putString("poseseconds", getPoseVision().toString());
+
+
+                    if(robotPose.isPresent()){
+                        SmartDashboard.putNumber("poseX", robotPose.get().estimatedPose.getX());
+                        SmartDashboard.putNumber("AAAAAAAAAAAAA2222AAAAAAA", LeftCamera.getLatestResult().getBestTarget().yaw);
+                    }     
                 }
                 
+
             }
         }
 
@@ -271,13 +277,10 @@ public class Vision extends SubsystemBase {
         return targetID;
     }
 
-    public Pose2d getPoseVision(){
-        return photonPoseEstimator.update(LeftCamera.getLatestResult()).get().estimatedPose.toPose2d();
-    }
-
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+    public Optional<EstimatedRobotPose> getPoseVision(){
         return photonPoseEstimator.update(LeftCamera.getLatestResult());
     }
+
 
     //public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
         
