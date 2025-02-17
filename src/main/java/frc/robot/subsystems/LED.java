@@ -10,6 +10,7 @@ import frc.robot.Constants.CanIDs;
 
 
 public class LED extends SubsystemBase {
+    public double value = -1;
     public enum BlinkinPattern {
         /*
          * Fixed Palette Pattern
@@ -145,6 +146,15 @@ public class LED extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("BlinkinPattern", m_blinkin.get());
+        /*
+        if(m_blinkin.get() != 1){
+            value = value + .01;
+        }
+        if(m_blinkin.get() == 1){
+            value = -1;
+        }
+        m_blinkin.set(value);
+        */
     }
 
     @Override

@@ -14,7 +14,6 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,8 +30,9 @@ public class Vision extends SubsystemBase {
     //make sure the name in quotes is EXACTLY the same as it is in PV
     PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
+    public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
-
+    /*
     public Optional<EstimatedRobotPose> robotPose;
     public Pose2d targetPose;
     public double yaw;
@@ -40,7 +40,6 @@ public class Vision extends SubsystemBase {
     public double area;
     public double skew;
     public double distance;
-    public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
 
     public Optional<Pose3d> targetpose;
@@ -49,6 +48,7 @@ public class Vision extends SubsystemBase {
     public double poseAmbiguity;
     public Transform3d bestCameraToTarget;
     public Transform3d alternateCameraToTarget;
+    */
 
 
     // The field from AprilTagFields will be different depending on the game.
@@ -140,61 +140,71 @@ public class Vision extends SubsystemBase {
         //You can retrieve the latest pipeline result using the PhotonCamera instance."
         //TODO: make stereo vision work?!?!
         //maybe just use one camera or what idk :sob:    
-    
-        if(LeftCamera.isConnected()){
-            var result = LeftCamera.getLatestResult();
+
 
         // Check if the latest result has any targets.
         //boolean hasTargets = result.hasTargets();
-
         // Get a list of currently tracked targets.
         //List<PhotonTrackedTarget> targets = result.getTargets();
+        //distance equation:
+        //distance = (targetheight - cameraheight) / tan(cameraangle + Ty)
+    
 
-        // Get the current best target.
-            if(result.hasTargets()){
-                PhotonTrackedTarget besttarget = result.getBestTarget();
-                yaw = besttarget.getYaw();
-                pitch = besttarget.getPitch();
-                area = besttarget.getArea();
-                skew = besttarget.getSkew();
+        //LEFTCAMERA VALUES
+        if(LeftCamera.isConnected()){
+            var Lresult = LeftCamera.getLatestResult();
+            // Get the current best target.
+            if(Lresult.hasTargets()){
+                PhotonTrackedTarget Lbesttarget = Lresult.getBestTarget();
+                double Lyaw = Lbesttarget.getYaw();
+                double Lpitch = Lbesttarget.getPitch();
+                double Larea = Lbesttarget.getArea();
+                double Lskew = Lbesttarget.getSkew();
 
-                targetID = besttarget.getFiducialId();
-                targetpose = aprilTagFieldLayout.getTagPose(targetID);
-                targetheight = targetpose.get().getMeasureZ().abs(Meter);
-                poseAmbiguity = besttarget.getPoseAmbiguity();
-                bestCameraToTarget = besttarget.getBestCameraToTarget(); //lowest error transform
-                alternateCameraToTarget = besttarget.getAlternateCameraToTarget(); //highest error transform
+                int LtargetID = Lbesttarget.getFiducialId();
+                Optional<Pose3d> Ltargetpose = aprilTagFieldLayout.getTagPose(LtargetID);
+                double Ltargetheight = Ltargetpose.get().getMeasureZ().abs(Meter);
+                double LposeAmbiguity = Lbesttarget.getPoseAmbiguity();
+                Transform3d LbestCameraToTarget = Lbesttarget.getBestCameraToTarget(); //lowest error transform
+                Transform3d LalternateCameraToTarget = Lbesttarget.getAlternateCameraToTarget(); //highest error transform
+            }
+        }
 
-                //robotPose = PhotonUtils.estimateFieldToRobotAprilTag(
-                //besttarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(besttarget.getFiducialId()).get(), visionData.robotToCamLeft);
-                /*
-                //distance equation:
-                //distance = (targetheight - cameraheight) / tan(cameraangle + Ty)
-                //THIS IS DISTANCE IN METERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                distance = (targetheight - visionData.leftCamHeight) / Math.tan((visionData.leftCamAngle.getAngle() + pitch) * (Math.PI/180));
-                distance = Math.sqrt(Math.pow(distance, 2)); //make sure distance is always positive
-                //double distance = (ShooterConstants.ApTagHeight - ShooterConstants.CamHeight) / Math.tan((ShooterConstants.CamAngle + (y)) * (Math.PI/180));
-                */
+        //RIGHTCAMERA VALUES
+        if(RightCamera.isConnected()){
+            var Rresult = LeftCamera.getLatestResult();
+            // Get the current best target.
+            if(Rresult.hasTargets()){
+                PhotonTrackedTarget Rbesttarget = Rresult.getBestTarget();
+                double Ryaw = Rbesttarget.getYaw();
+                double Rpitch = Rbesttarget.getPitch();
+                double Rarea = Rbesttarget.getArea();
+                double Rskew = Rbesttarget.getSkew();
+
+                int RtargetID = Rbesttarget.getFiducialId();
+                Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(RtargetID);
+                double Rtargetheight = Rtargetpose.get().getMeasureZ().abs(Meter);
+                double RposeAmbiguity = Rbesttarget.getPoseAmbiguity();
+                Transform3d RbestCameraToTarget = Rbesttarget.getBestCameraToTarget(); //lowest error transform
+                Transform3d RalternateCameraToTarget = Rbesttarget.getAlternateCameraToTarget(); //highest error transform
+            }
+        }
 
 
-                SmartDashboard.putNumber("SDYaw", yaw); //set zero if value2 does not exist //TODO:
-
-
-                if(getPoseVision().isPresent()){
-                    robotPose = getPoseVision();
+                if(!getPoseVision().isEmpty()){
+                    //robotPose = getPoseVision();
                     photonPoseEstimator.update(LeftCamera.getLatestResult());
                     SmartDashboard.putNumber("random", Math.random());
-                    SmartDashboard.putString("poseseconds", getPoseVision().toString());
+                    SmartDashboard.putString("poseestimaorstring", photonPoseEstimator.toString());
+                    SmartDashboard.putString("posestring2", photonPoseEstimator.getPrimaryStrategy().toString());
+                    //SmartDashboard.putString("posestring3", photonPoseEstimator.getReferencePose().toString());
 
+                    //SmartDashboard.putString("posestring3", photonPoseEstimator.update(LeftCamera.getLatestResult()).get().toString());
 
-                    if(robotPose.isPresent()){
-                        SmartDashboard.putNumber("poseX", robotPose.get().estimatedPose.getX());
-                        SmartDashboard.putNumber("AAAAAAAAAAAAA2222AAAAAAA", LeftCamera.getLatestResult().getBestTarget().yaw);
-                    }     
+                    //SmartDashboard.putNumber("poseseconds", getPoseVision().);   
                 }
                 
 
-            }
         }
 
         
@@ -212,13 +222,7 @@ public class Vision extends SubsystemBase {
         //-------------------------------------------------
         //smartdashboardstuff
 
-        SmartDashboard.putNumber("TargetYaw", yaw);
-        SmartDashboard.putNumber("TargetPitch", pitch);
-        SmartDashboard.putNumber("TargetArea", area);
-        SmartDashboard.putNumber("TargetSkew", skew);
-        SmartDashboard.putNumber("TargetID", targetID);
-        SmartDashboard.putNumber("TargetPoseAmbiguity", poseAmbiguity);
-    }
+    
 
     @Override
     public void simulationPeriodic() {
@@ -233,49 +237,6 @@ public class Vision extends SubsystemBase {
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
 
-    public Double getYaw(){
-        if(LeftCamera.isConnected() || RightCamera.isConnected()){
-            var value = LeftCamera.getLatestResult();
-            double yaw = value.getBestTarget().yaw;
-            return yaw;
-        }
-        return null;
-    }
-
-
-    public Double getPitch(String camera){
-        if(LeftCamera.isConnected() || RightCamera.isConnected()){
-            var value = LeftCamera.getLatestResult();
-            double yaw = value.getBestTarget().pitch;
-            return yaw;
-        }
-        return null;
-    }
-
-
-    public Double getArea(String camera){
-        if(LeftCamera.isConnected() || RightCamera.isConnected()){
-            var value = LeftCamera.getLatestResult();
-            double yaw = value.getBestTarget().area;
-            return yaw;
-        }
-        return null;
-    }
-
-
-    public Double getSkew(String camera){
-        if(LeftCamera.isConnected() || RightCamera.isConnected()){
-            var value = LeftCamera.getLatestResult();
-            double yaw = value.getBestTarget().skew;
-            return yaw;
-        }
-        return null;
-    }
-
-
-    public int getID(){
-        return targetID;
-    }
 
     public Optional<EstimatedRobotPose> getPoseVision(){
         return photonPoseEstimator.update(LeftCamera.getLatestResult());

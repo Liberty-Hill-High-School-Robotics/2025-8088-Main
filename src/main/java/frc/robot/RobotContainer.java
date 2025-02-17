@@ -101,7 +101,6 @@ public class RobotContainer {
 
     //DriveSubsytem Exports
     SmartDashboard.putData("TESTRUN", new TESTRUN(m_drivesubsystem));
-    SmartDashboard.putNumber("YawValue", m_vision.yaw);
     SmartDashboard.putNumber("inception", SmartDashboard.getNumber("SDYaw", 0));
 
 
