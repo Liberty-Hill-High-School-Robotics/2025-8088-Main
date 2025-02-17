@@ -2,11 +2,13 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -14,7 +16,9 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -73,8 +77,6 @@ public class Vision extends SubsystemBase {
          * A tracked target contains information about each target from a pipeline result. This information includes yaw, pitch, area, and robot relative pose.
          */
 
-        
-
         /*
          * double getYaw() = yaw of target in degrees (positive right)
          * double getPitch() = pitch of target in degress (positive up)
@@ -82,11 +84,6 @@ public class Vision extends SubsystemBase {
          * double[] getCorners() = the 4 corners of the miniumum bounding box rectangle
          * Transform2d getCameraToTarget() = the camera to target transform, see 2d transform documentation
          */
-
-         // Get information from target.
-        
-        
-
         /*
          * note:
          * you can also get fiducial id, pose ambiguity, best camear to target, and alternate camera to target
@@ -110,24 +107,12 @@ public class Vision extends SubsystemBase {
         kCameraHeight, kTargetHeight, kCameraPitch, kTargetPitch, Rotation2d.fromDegrees(-besttarget.getYaw()), gyro.getRotation2d(), targetPose, visionData.robotToCamLeft);
         */
 
-        
-
-        
-        
-
         //get yaw towards target, i.e. hub from 2022 rapid react
         //Rotation2d targetYaw = PhotonUtils.getYawToPose(RobotPose, targetPose);
 
         // Construct PhotonPoseEstimator
         //photon vision docs says this needs the camera as an argument, but this doesn't want it, take note of this
         //addvisionmeasurement...?
-
-        
-
-
-
-        
-
 
     }
 
@@ -167,6 +152,23 @@ public class Vision extends SubsystemBase {
                 double LposeAmbiguity = Lbesttarget.getPoseAmbiguity();
                 Transform3d LbestCameraToTarget = Lbesttarget.getBestCameraToTarget(); //lowest error transform
                 Transform3d LalternateCameraToTarget = Lbesttarget.getAlternateCameraToTarget(); //highest error transform
+
+                Pose2d Ltargetpose2D = Ltargetpose.get().toPose2d();
+                //Pose Estimate
+                //target pitch == 0
+                //camera pitch == check constants
+                Pose2d robotPoseL = PhotonUtils.estimateFieldToRobot(        
+                visionData.leftCamHeight, Ltargetheight, visionData.leftCamPitch, 1,
+                Rotation2d.fromDegrees(-Lbesttarget.getYaw()), m_gyro.getRotation2d(), Ltargetpose2D, visionData.robotToCamLeft2D);
+                SmartDashboard.putNumber("poseLX", robotPoseL.getTranslation().getX());
+                SmartDashboard.putNumber("poseLY", robotPoseL.getY());
+                SmartDashboard.putNumber("poseLR", robotPoseL.getRotation().getDegrees());
+                SmartDashboard.putNumber("poseLXT", Ltargetpose.get().getX());
+                SmartDashboard.putNumber("poseLYT", Ltargetpose.get().getY());
+                SmartDashboard.putNumber("poseLRT", Ltargetpose.get().getRotation().getAngle());
+
+
+
             }
         }
 
@@ -187,20 +189,41 @@ public class Vision extends SubsystemBase {
                 double RposeAmbiguity = Rbesttarget.getPoseAmbiguity();
                 Transform3d RbestCameraToTarget = Rbesttarget.getBestCameraToTarget(); //lowest error transform
                 Transform3d RalternateCameraToTarget = Rbesttarget.getAlternateCameraToTarget(); //highest error transform
+                Pose2d Rtargetpose2D = Rtargetpose.get().toPose2d();
+
+
+                Pose2d robotPoseR = PhotonUtils.estimateFieldToRobot(        
+                visionData.rightCamHeight, Rtargetheight, visionData.rightCamPitch, 1.0,
+                Rotation2d.fromDegrees(-Rbesttarget.getYaw()), m_gyro.getRotation2d(), Rtargetpose2D, visionData.robotToCamLeft2D);
+                SmartDashboard.putNumber("poseRX", robotPoseR.getTranslation().getX());
+                SmartDashboard.putNumber("poseRY", robotPoseR.getY());
+                SmartDashboard.putNumber("poseRR", robotPoseR.getRotation().getDegrees());
+                SmartDashboard.putNumber("poseRXT", Rtargetpose.get().getX());
+                SmartDashboard.putNumber("poseRYT", Rtargetpose.get().getY());
+                SmartDashboard.putNumber("poseRRT", Rtargetpose.get().getRotation().getAngle());
             }
         }
 
 
-                if(!getPoseVision().isEmpty()){
-                    //robotPose = getPoseVision();
+                 try 
+                {
+                    EstimatedRobotPose robotPose = getPoseVision().get();
+                    double timestepseconds = robotPose.timestampSeconds;
+                    SmartDashboard.putNumber("timestampsec", timestepseconds);
+                }
+                catch (Exception e)
+                {
+                    //Couldn't get robotPose: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                }    
+
+                if(!getPoseVision().isEmpty()){ //&& getPoseVision().get().timestampSeconds > 1){
+
                     photonPoseEstimator.update(LeftCamera.getLatestResult());
                     SmartDashboard.putNumber("random", Math.random());
                     SmartDashboard.putString("poseestimaorstring", photonPoseEstimator.toString());
                     SmartDashboard.putString("posestring2", photonPoseEstimator.getPrimaryStrategy().toString());
                     //SmartDashboard.putString("posestring3", photonPoseEstimator.getReferencePose().toString());
-
                     //SmartDashboard.putString("posestring3", photonPoseEstimator.update(LeftCamera.getLatestResult()).get().toString());
-
                     //SmartDashboard.putNumber("poseseconds", getPoseVision().);   
                 }
                 

@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -31,10 +33,21 @@ public final class Constants {
   public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33, 0.203, 0.178), new Rotation3d(0,0,0));
   public static final double leftCamHeight = robotToCamLeft.getZ();
   public static final Rotation3d leftCamAngle = robotToCamLeft.getRotation();
+  public static final double leftCamPitch = 1;
+
+  public static final Rotation2d robotToCamAngleLeft2D = leftCamAngle.toRotation2d();
+  public static final Transform2d robotToCamLeft2D = new Transform2d(0, 0, robotToCamAngleLeft2D);
+
   
+
   public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33, -0.203, 0.178), new Rotation3d(0,0,0));
   public static final double rightCamHeight = robotToCamRight.getZ();
   public static final Rotation3d rightCamAngle = robotToCamRight.getRotation();
+  public static final double rightCamPitch = 0;
+
+  public static final Rotation2d robotToCamAngleRight2D = leftCamAngle.toRotation2d();
+  public static final Transform2d robotToCamRight2D = new Transform2d(0, 0, robotToCamAngleRight2D);
+
 
   }
   //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
@@ -69,11 +82,11 @@ public final class Constants {
 
 
     //TUNE THESE!!!
-    public static final double rP = 0.1;
-    public static final double rI = 0;
+    public static final double rP = 10;
+    public static final double rI = 0.1;
     public static final double rD = 0;
-    public static final double tP = 0.04;
-    public static final double tI = 0;
+    public static final double tP = 10;
+    public static final double tI = 0.1;
     public static final double tD = 0;
 
 

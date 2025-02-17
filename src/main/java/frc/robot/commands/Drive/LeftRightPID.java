@@ -12,9 +12,8 @@ public class LeftRightPID extends Command {
   private final DriveSubsystem m_DriveSubsystem;
   double localvalue;
 
-  public LeftRightPID(DriveSubsystem subsystem, double current) {
+  public LeftRightPID(DriveSubsystem subsystem) {
     m_DriveSubsystem = subsystem;
-    localvalue = current;
     addRequirements(m_DriveSubsystem);
   }
 
@@ -25,7 +24,7 @@ public class LeftRightPID extends Command {
 
   @Override
   public void execute(){
-    m_DriveSubsystem.leftrightPIDcontrol(localvalue);
+    m_DriveSubsystem.FullPIDControl();
   }
 
   @Override

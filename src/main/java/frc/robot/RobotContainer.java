@@ -166,7 +166,7 @@ public class RobotContainer {
      */
 
      final Trigger AlignXButton = m_driverController.b();
-     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem, SmartDashboard.getNumber("SDYaw", 0)));
+     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
   }
 
   /**

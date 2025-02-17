@@ -18,12 +18,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -33,7 +30,6 @@ import com.ctre.phoenix6.hardware.*;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import frc.robot.subsystems.Vision;
 
 public class DriveSubsystem extends SubsystemBase {
   RobotConfig driveConfig;
@@ -119,6 +115,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("gyrovalue", getHeading());
     
     // Update the odometry in the periodic block
     m_odometry.update(
@@ -294,6 +291,17 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void TESTRUN(){
     var speeds = new ChassisSpeeds(1, 1, 0);
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
+  }
+
+  public void FullPIDControl(){
+    double calcX = TranslationPID.calculate(SmartDashboard.getNumber("poseLX", 0), (SmartDashboard.getNumber("poseLXT", 0) - .0));
+    double calcY = TranslationPID.calculate(SmartDashboard.getNumber("poseLY", 0), (SmartDashboard.getNumber("poseLYT", 0) + .0));
+    //double calcR = turningPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
+
+    var speeds = new ChassisSpeeds(calcX, calcY,
+    -MathUtil.applyDeadband(m_driverControllerLocal.getRightX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed);
+    //apply these speeds
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 }
