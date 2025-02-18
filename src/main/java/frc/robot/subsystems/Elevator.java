@@ -1,63 +1,45 @@
 package frc.robot.subsystems;
 
+import java.lang.reflect.Type;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.jni.CANSparkJNI;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.MotorSpeeds;
 
 
 
 public class Elevator extends SubsystemBase {
 
     //motors & variables here, define them and create any PIDs needed
-    private CANSparkMax elevatorSparkMax;
-    private CANSparkMax elevatorSparkMax2;
+    private SparkMax elevatorSparkMax;
+    private SparkMax elevatorSparkMax2;
     private RelativeEncoder elevatorRelativeEncoder;
     private RelativeEncoder elevatorRelativeEncoder2;
-    private SparkLimitSwitch elevatorReverseLimit;
-    private SparkLimitSwitch elevatorForwardLimit;
+    private SparkLimitSwitch elevatorBottomLimit;
+    private SparkLimitSwitch elevatorTopLimit;
 
     public Elevator(){
         //config motor settings here
         //config motor settings here
-        elevatorSparkMax = new CANSparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
-        elevatorSparkMax.restoreFactoryDefaults();
-        elevatorSparkMax.setInverted(true);
-        elevatorSparkMax.setIdleMode(IdleMode.kBrake);
-        elevatorSparkMax.setSmartCurrentLimit(40);
+        elevatorSparkMax = new SparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
+        elevatorBottomLimit = elevatorSparkMax.getReverseLimitSwitch();
 
-        elevatorReverseLimit = elevatorSparkMax.getReverseLimitSwitch(com.revrobotics.SparkLimitSwitch.Type.kNormallyOpen);
-
-        elevatorSparkMax2 = new CANSparkMax(CanIDs.elevatorMotor2ID, MotorType.kBrushless);
-        elevatorSparkMax2.restoreFactoryDefaults();
-        elevatorSparkMax2.setInverted(true);
-        elevatorSparkMax2.setIdleMode(IdleMode.kBrake);
-        elevatorSparkMax2.setSmartCurrentLimit(40);
-
-        elevatorForwardLimit = elevatorSparkMax2.getForwardLimitSwitch(com.revrobotics.SparkLimitSwitch.Type.kNormallyOpen);
+        elevatorSparkMax2 = new SparkMax(CanIDs.elevatorMotor2ID, MotorType.kBrushless);
+        elevatorTopLimit = elevatorSparkMax2.getForwardLimitSwitch();
         
         //elevatorRelativeEncoder.
         elevatorRelativeEncoder = elevatorSparkMax.getEncoder();
         elevatorRelativeEncoder2 = elevatorSparkMax2.getEncoder();
-
-        /*
-        ex:
-        barRotatorSparkMax = new CANSparkMax(CanIDs.barRotatorID, MotorType.kBrushless);
-        //barRotatorSparkMax.restoreFactoryDefaults();
-        barRotatorSparkMax.setInverted(true);
-        barRotatorSparkMax.setIdleMode(IdleMode.kBrake);
-        barRotatorSparkMax.setSmartCurrentLimit(40);
-
-        barReverseLimitSwitch = barRotatorSparkMax.getReverseLimitSwitch(Type.kNormallyOpen);
-
-        barRotatorSparkMax.enableSoftLimit(SoftLimitDirection.kForward, true);
-        barRotatorSparkMax.setSoftLimit(SoftLimitDirection.kForward, BarConstants.fLimit);
-
-        barRotatorRelativeEncoder = barRotatorSparkMax.getEncoder();
-        */
     }
 
   
@@ -81,10 +63,26 @@ public class Elevator extends SubsystemBase {
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
 
-    public void ___(){
-        //motor.set(PID.calculate(position, setpoint));
-        //motor.set(number);
-        
+    public void elevatorUp(){
+        elevatorSparkMax.set(MotorSpeeds.elevatorSpeed);
+        elevatorSparkMax.set(MotorSpeeds.elevatorSpeed);
     }
 
+    public void elevatorDown(){
+        elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
+        elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
+    }
+
+    public void elevatorStop(){
+        elevatorSparkMax.stopMotor();
+        elevatorSparkMax.stopMotor();
+    }
+
+    public boolean elevatorAtBottomLimit(){
+        return elevatorBottomLimit.isPressed();
+    }
+
+    public boolean elevatorAtTopLimit(){
+        return elevatorTopLimit.isPressed();
+    }
 }
