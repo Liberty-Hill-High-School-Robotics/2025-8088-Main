@@ -1,22 +1,47 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CanIDs;
 
 
 
 public class Elevator extends SubsystemBase {
 
     //motors & variables here, define them and create any PIDs needed
-    /* ex:
-    private CANSparkMax barRotatorSparkMax;
-    private SparkLimitSwitch barReverseLimitSwitch;
-    public static RelativeEncoder barRotatorRelativeEncoder;
-    PIDController barPID = new PIDController(BarConstants.bP, BarConstants.bI, BarConstants.bD);
-    */
+    private CANSparkMax elevatorSparkMax;
+    private CANSparkMax elevatorSparkMax2;
+    private RelativeEncoder elevatorRelativeEncoder;
+    private RelativeEncoder elevatorRelativeEncoder2;
+    private SparkLimitSwitch elevatorReverseLimit;
+    private SparkLimitSwitch elevatorForwardLimit;
 
     public Elevator(){
         //config motor settings here
+        //config motor settings here
+        elevatorSparkMax = new CANSparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
+        elevatorSparkMax.restoreFactoryDefaults();
+        elevatorSparkMax.setInverted(true);
+        elevatorSparkMax.setIdleMode(IdleMode.kBrake);
+        elevatorSparkMax.setSmartCurrentLimit(40);
+
+        elevatorReverseLimit = elevatorSparkMax.getReverseLimitSwitch(com.revrobotics.SparkLimitSwitch.Type.kNormallyOpen);
+
+        elevatorSparkMax2 = new CANSparkMax(CanIDs.elevatorMotor2ID, MotorType.kBrushless);
+        elevatorSparkMax2.restoreFactoryDefaults();
+        elevatorSparkMax2.setInverted(true);
+        elevatorSparkMax2.setIdleMode(IdleMode.kBrake);
+        elevatorSparkMax2.setSmartCurrentLimit(40);
+
+        elevatorForwardLimit = elevatorSparkMax2.getForwardLimitSwitch(com.revrobotics.SparkLimitSwitch.Type.kNormallyOpen);
+        
+        //elevatorRelativeEncoder.
+        elevatorRelativeEncoder = elevatorSparkMax.getEncoder();
+        elevatorRelativeEncoder2 = elevatorSparkMax2.getEncoder();
 
         /*
         ex:

@@ -82,12 +82,12 @@ public final class Constants {
 
 
     //TUNE THESE!!!
-    public static final double rP = 10;
-    public static final double rI = 0.1;
-    public static final double rD = 0;
-    public static final double tP = 10;
-    public static final double tI = 0.1;
-    public static final double tD = 0;
+    public static final double xP = 1;
+    public static final double xI = 0.1;
+    public static final double xD = 0;
+    public static final double yP = 1;
+    public static final double yI = 0.1;
+    public static final double yD = 0;
 
 
     // Driving Parameters - Note that these are not the maximum capable speeds of

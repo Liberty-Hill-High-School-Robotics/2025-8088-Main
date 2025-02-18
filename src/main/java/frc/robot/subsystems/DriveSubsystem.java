@@ -7,8 +7,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -16,6 +17,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CanIDs;
@@ -24,7 +28,9 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
-import org.photonvision.PhotonUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ctre.phoenix6.hardware.*;
 import com.pathplanner.lib.config.PIDConstants;
@@ -60,8 +66,16 @@ public class DriveSubsystem extends SubsystemBase {
 
   public CommandXboxController m_driverControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
   //add a turning PID to manually control the turning of the robot, and translation pid
-  PIDController turningPID = new PIDController(DriveConstants.rP, DriveConstants.rI, DriveConstants.rD);
-  PIDController TranslationPID = new PIDController(DriveConstants.tP, DriveConstants.tI, DriveConstants.tD);
+  PIDController TranslationPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
+
+  TrajectoryConfig PathConfig = new TrajectoryConfig(DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxAngularSpeed);
+  
+  //create holonomicdrivecontroller for path following
+  HolonomicDriveController controller = new HolonomicDriveController(
+  new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD), 
+  new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD),
+  new ProfiledPIDController(1, 0, 0,
+    new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxSpeedMetersPerSecond)));
 
 
   // Odometry class for tracking robot pose
@@ -256,28 +270,6 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds));
   }
 
-  public double turnPID(Pose2d targetPose, double setpoint){
-    //TUNE
-    double current = (targetPose.getX());
-    double output = (turningPID.calculate(current, setpoint));
-    return output;
-  }
-
-  public double driveDistancePID(Pose2d targetPose, double setpoint, Pose2d RobotPose){
-    //TUNE
-    double current = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
-    double output = TranslationPID.calculate(current, setpoint);
-    return output;
-  }
-
-  public void turnChassis(double turnRate) {
-    var speeds = new ChassisSpeeds((-MathUtil.applyDeadband(m_driverControllerLocal.getLeftY(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed), turnRate);
-    //apply swerve module states
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
-  }
-
-
 
   public void leftrightPIDcontrol(double current){
     double calc = TranslationPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
@@ -289,19 +281,34 @@ public class DriveSubsystem extends SubsystemBase {
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 
+
   public void TESTRUN(){
     var speeds = new ChassisSpeeds(1, 1, 0);
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 
-  public void FullPIDControl(){
-    double calcX = TranslationPID.calculate(SmartDashboard.getNumber("poseLX", 0), (SmartDashboard.getNumber("poseLXT", 0) - .0));
-    double calcY = TranslationPID.calculate(SmartDashboard.getNumber("poseLY", 0), (SmartDashboard.getNumber("poseLYT", 0) + .0));
-    //double calcR = turningPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
 
-    var speeds = new ChassisSpeeds(calcX, calcY,
-    -MathUtil.applyDeadband(m_driverControllerLocal.getRightX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed);
+  public void FullPIDControl(){
+    Pose2d end = new Pose2d(
+    SmartDashboard.getNumber("poseLXT", 0), 
+    SmartDashboard.getNumber("poseLYT", 0), 
+    Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0)));
+
+    Pose2d robotpose = new Pose2d(
+    SmartDashboard.getNumber("poseLX", 0), 
+    SmartDashboard.getNumber("poseLY", 0), 
+    Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLR", 0)));
+
+    List<Pose2d> poselist = new ArrayList<>();
+    poselist.add(end);
+    poselist.add(robotpose);
+
+    PathConfig.setEndVelocity(0);
+    PathConfig.setStartVelocity(0);
+    var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig);
+    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), robotpose.getRotation());
+
     //apply these speeds
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
   }
 }
