@@ -33,7 +33,7 @@ public final class Constants {
   public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33, 0.203, 0.178), new Rotation3d(0,0,0));
   public static final double leftCamHeight = robotToCamLeft.getZ();
   public static final Rotation3d leftCamAngle = robotToCamLeft.getRotation();
-  public static final double leftCamPitch = 1;
+  public static final double leftCamPitch = 90;
 
   public static final Rotation2d robotToCamAngleLeft2D = leftCamAngle.toRotation2d();
   public static final Transform2d robotToCamLeft2D = new Transform2d(0, 0, robotToCamAngleLeft2D);
@@ -43,7 +43,7 @@ public final class Constants {
   public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33, -0.203, 0.178), new Rotation3d(0,0,0));
   public static final double rightCamHeight = robotToCamRight.getZ();
   public static final Rotation3d rightCamAngle = robotToCamRight.getRotation();
-  public static final double rightCamPitch = 0;
+  public static final double rightCamPitch = 90;
 
   public static final Rotation2d robotToCamAngleRight2D = leftCamAngle.toRotation2d();
   public static final Transform2d robotToCamRight2D = new Transform2d(0, 0, robotToCamAngleRight2D);
@@ -56,8 +56,8 @@ public final class Constants {
     //can IDs
     public static final int BlinkinPWMPort = 0;
     public static final int GyroID = 9;
-    public static final int elevatorMotorID = 999;
-    public static final int elevatorMotor2ID = 999;
+    public static final int elevatorMotorID = 10;
+    public static final int elevatorMotor2ID = 11;
 
 
   }
@@ -128,15 +128,15 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFLDrivingCAN = 6;
-    public static final int kFRDrivingCAN = 4;
-    public static final int kBLDrivingCAN = 8;
-    public static final int kBRDrivingCAN = 2;
+    public static final int kFLDrivingCAN = 1;
+    public static final int kFRDrivingCAN = 2;
+    public static final int kBLDrivingCAN = 3;
+    public static final int kBRDrivingCAN = 4;
 
     public static final int kFLTurningCAN = 5;
-    public static final int kFRTurningCAN = 3;
+    public static final int kFRTurningCAN = 6;
     public static final int kBLTurningCAN = 7;
-    public static final int kBRTurningCAN = 1;
+    public static final int kBRTurningCAN = 8;
 
     public static final boolean kGyroReversed = false;
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(Module_Info);
@@ -167,7 +167,7 @@ public final class Constants {
     //controller ports
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
-    public static final double kDriveDeadband = 0.3;
+    public static final double kDriveDeadband = 0.2;
   }
 
 
