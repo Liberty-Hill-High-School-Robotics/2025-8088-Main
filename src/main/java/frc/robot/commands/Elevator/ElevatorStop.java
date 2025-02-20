@@ -23,7 +23,7 @@ public class ElevatorStop extends Command {
 
   @Override
   public void execute(){
-
+    m_elevator.elevatorStop();
   }
 
   @Override 

@@ -1,6 +1,6 @@
 package frc.robot.commands.Elevator;
-import frc.robot.subsystems.Elevator;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Elevator;
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}. Written explicitly for
@@ -23,16 +23,16 @@ public class ElevatorUp extends Command {
 
   @Override
   public void execute(){
-
+    m_elevator.elevatorUp();
   }
 
   @Override 
   public void end(boolean interrupted){
-
-   }
+    m_elevator.elevatorStop();
+  }
 
   @Override
   public boolean isFinished() {
-    return false;
+    return m_elevator.elevatorAtTopLimit();
   }
 }
