@@ -1,15 +1,10 @@
 package frc.robot.subsystems;
 
-import java.lang.reflect.Type;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.jni.CANSparkJNI;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
