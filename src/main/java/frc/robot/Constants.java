@@ -30,23 +30,23 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static final class visionData{
 
-  public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33, 0.203, 0.178), new Rotation3d(0,0,0));
+  public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33655, -0.1778, 0.229), new Rotation3d(0,90,0));
   public static final double leftCamHeight = robotToCamLeft.getZ();
   public static final Rotation3d leftCamAngle = robotToCamLeft.getRotation();
-  public static final double leftCamPitch = 90;
+  public static final double leftCamPitch = Math.PI/2;
 
   public static final Rotation2d robotToCamAngleLeft2D = leftCamAngle.toRotation2d();
-  public static final Transform2d robotToCamLeft2D = new Transform2d(0, 0, robotToCamAngleLeft2D);
+  public static final Transform2d robotToCamLeft2D = new Transform2d(0.33655, -0.1778, robotToCamAngleLeft2D);
 
   
 
-  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33, -0.203, 0.178), new Rotation3d(0,0,0));
+  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33655, 0.1778, 0.226), new Rotation3d(0,90,0));
   public static final double rightCamHeight = robotToCamRight.getZ();
   public static final Rotation3d rightCamAngle = robotToCamRight.getRotation();
-  public static final double rightCamPitch = 90;
+  public static final double rightCamPitch = Math.PI/2;
 
   public static final Rotation2d robotToCamAngleRight2D = leftCamAngle.toRotation2d();
-  public static final Transform2d robotToCamRight2D = new Transform2d(0, 0, robotToCamAngleRight2D);
+  public static final Transform2d robotToCamRight2D = new Transform2d(0.33655, 0.1778, robotToCamAngleRight2D);
 
 
   }
@@ -88,11 +88,11 @@ public final class Constants {
 
 
     //TUNE THESE!!!
-    public static final double xP = 1;
-    public static final double xI = 0.1;
+    public static final double xP = 0.125;
+    public static final double xI = 0;
     public static final double xD = 0;
-    public static final double yP = 1;
-    public static final double yI = 0.1;
+    public static final double yP = 0.1;
+    public static final double yI = 0;
     public static final double yD = 0;
 
 
@@ -102,9 +102,9 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(27);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final double kWheelBase = Units.inchesToMeters(27);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),

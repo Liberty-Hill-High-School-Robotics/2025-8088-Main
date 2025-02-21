@@ -24,7 +24,7 @@ public class LeftRightPID extends Command {
 
   @Override
   public void execute(){
-    m_DriveSubsystem.FullPIDControl();
+    m_DriveSubsystem.TESTRUN();
   }
 
   @Override

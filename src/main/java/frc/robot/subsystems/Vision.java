@@ -157,15 +157,20 @@ public class Vision extends SubsystemBase {
                 //target pitch == 0
                 //camera pitch == check constants
                 Pose2d robotPoseL = PhotonUtils.estimateFieldToRobot(        
-                visionData.leftCamHeight, Ltargetheight, visionData.leftCamPitch, 1,
+                visionData.leftCamHeight, Ltargetheight, visionData.leftCamPitch, (Lbesttarget.pitch * (Math.PI/180)),
                 Rotation2d.fromDegrees(-Lbesttarget.getYaw()), m_gyro.getRotation2d(), Ltargetpose2D, visionData.robotToCamLeft2D);
-                SmartDashboard.putNumber("poseLX", robotPoseL.getTranslation().getX());
+                SmartDashboard.putNumber("poseLX", robotPoseL.getX());
                 SmartDashboard.putNumber("poseLY", robotPoseL.getY());
                 SmartDashboard.putNumber("poseLR", robotPoseL.getRotation().getDegrees());
+
+
                 SmartDashboard.putNumber("poseLXT", Ltargetpose.get().getX());
                 SmartDashboard.putNumber("poseLYT", Ltargetpose.get().getY());
                 SmartDashboard.putNumber("poseLRT", Ltargetpose.get().getRotation().getAngle());
 
+                if (Lresult.getMultiTagResult().isPresent()){
+
+                }
 
 
             }
@@ -191,40 +196,34 @@ public class Vision extends SubsystemBase {
                 Pose2d Rtargetpose2D = Rtargetpose.get().toPose2d();
 
 
-                Pose2d robotPoseR = PhotonUtils.estimateFieldToRobot(        
-                visionData.rightCamHeight, Rtargetheight, visionData.rightCamPitch, 1.0,
+                double valeue = PhotonUtils.calculateDistanceToTargetMeters(visionData.rightCamHeight, Rtargetheight, visionData.rightCamPitch, (Rbesttarget.pitch * (Math.PI/180)));
+                valeue = valeue * 1000;
+                SmartDashboard.putNumber("distanceValue", valeue);
+                var relative = PhotonUtils.estimateCameraToTargetTranslation(valeue, Rbesttarget.bestCameraToTarget.getRotation().toRotation2d());
+                SmartDashboard.putNumber("cameratotargetX", relative.getX());
+                SmartDashboard.putNumber("cameratotargetY", relative.getY());
+                SmartDashboard.putNumber("cameratotargetA", relative.getAngle().getDegrees());
+
+
+
+
+                Pose2d robotPoseR = PhotonUtils.estimateFieldToRobot(   
+                     
+                visionData.rightCamHeight, Rtargetheight, visionData.rightCamPitch, (Rbesttarget.pitch * (Math.PI/180)),
                 Rotation2d.fromDegrees(-Rbesttarget.getYaw()), m_gyro.getRotation2d(), Rtargetpose2D, visionData.robotToCamLeft2D);
-                SmartDashboard.putNumber("poseRX", robotPoseR.getTranslation().getX());
+
+                SmartDashboard.putNumber("poseRX", robotPoseR.getX());
                 SmartDashboard.putNumber("poseRY", robotPoseR.getY());
                 SmartDashboard.putNumber("poseRR", robotPoseR.getRotation().getDegrees());
                 SmartDashboard.putNumber("poseRXT", Rtargetpose.get().getX());
                 SmartDashboard.putNumber("poseRYT", Rtargetpose.get().getY());
                 SmartDashboard.putNumber("poseRRT", Rtargetpose.get().getRotation().getAngle());
+                SmartDashboard.putNumber("angledegrese", (Rtargetpose.get().getRotation().getAngle()) * (180/Math.PI));
+
+
             }
         }
-
-
-                 try 
-                {
-                    EstimatedRobotPose robotPose = getPoseVision().get();
-                    double timestepseconds = robotPose.timestampSeconds;
-                    SmartDashboard.putNumber("timestampsec", timestepseconds);
-                }
-                catch (Exception e)
-                {
-                    //Couldn't get robotPose: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                }    
-
-                if(!getPoseVision().isEmpty()){ //&& getPoseVision().get().timestampSeconds > 1){
-
-                    photonPoseEstimator.update(LeftCamera.getLatestResult());
-                    SmartDashboard.putNumber("random", Math.random());
-                    SmartDashboard.putString("poseestimaorstring", photonPoseEstimator.toString());
-                    SmartDashboard.putString("posestring2", photonPoseEstimator.getPrimaryStrategy().toString());
-                    //SmartDashboard.putString("posestring3", photonPoseEstimator.getReferencePose().toString());
-                    //SmartDashboard.putString("posestring3", photonPoseEstimator.update(LeftCamera.getLatestResult()).get().toString());
-                    //SmartDashboard.putNumber("poseseconds", getPoseVision().);   
-                }
+        
                 
 
         }

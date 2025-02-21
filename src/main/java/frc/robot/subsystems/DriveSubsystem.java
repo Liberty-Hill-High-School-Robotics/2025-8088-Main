@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -283,7 +284,17 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public void TESTRUN(){
-    var speeds = new ChassisSpeeds(1, 1, 0);
+    double distance = SmartDashboard.getNumber("distanceValue", 0);
+    double rotation = SmartDashboard.getNumber("angledegrese", 180);
+    double calc = TranslationPID.calculate(distance, 3.5);
+    double calcR = TranslationPID.calculate(m_gyro.getYaw().getValueAsDouble(), rotation);
+
+
+    var speeds = new ChassisSpeeds((-calc * DriveConstants.kMaxAngularSpeed),
+                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
+                                   (calcR));
+    //apply swerve module states
+
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
   }
 
