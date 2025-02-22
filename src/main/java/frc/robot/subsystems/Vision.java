@@ -30,6 +30,7 @@ public class Vision extends SubsystemBase {
     PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
+    public final double xDistance = 0.356;
 
 
     // The field from AprilTagFields will be different depending on the game.
@@ -119,6 +120,92 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("poseRXT", Rtargetpose.get().getX());
                 SmartDashboard.putNumber("poseRYT", Rtargetpose.get().getY());
                 SmartDashboard.putNumber("poseRRT", Rtargetpose.get().getRotation().getAngle());
+            }
+        }
+
+
+        //distance estimator
+        if(RightCamera.isConnected() && LeftCamera.isConnected()){
+            var Rresult = RightCamera.getLatestResult();
+            var Lresult = LeftCamera.getLatestResult();
+
+            if(Rresult.hasTargets() && Lresult.hasTargets()){
+                double yawR = Rresult.getBestTarget().yaw;
+                double yawL = Lresult.getBestTarget().yaw;
+                double yawRB = Rresult.getBestTarget().yaw;
+                double yawLB = Lresult.getBestTarget().yaw;
+                double c;
+                double A;
+                double B;
+                double D;
+                double yawC = m_gyro.getYaw().getValueAsDouble();
+                yawC = Math.abs(yawC % 360);
+                //get yaw on a scale of 0-360
+                if(yawC < 90 && yawC > 0){
+                    yawC = Math.abs(90 - yawC);
+                    //get difference to 90 if yaw between 0 and 90
+                }
+                else{
+                    yawC = yawC % 90;
+                    //return otherwise if not between 0 and 90
+                }
+
+
+                /*
+                * Math process:
+                * First, normalize yaw values
+                * calculate (gyro rotation - pose rotation)
+                * yaw = yaw - calculated value
+                * ^ that will normalize yaw so it works if chassis is not 90­°
+                * 
+                * take ASA (angle side angle), solve for missing angle
+                * plug into law of sines
+                * A/sin(a) = B/sin(b) = C/sin(c)
+                * 
+                * solve for missing side, either one
+                * tan(a) * A = D
+                * or
+                * tan(b) * B = D
+                * assuming C is the known side
+                */
+
+                //values adjusted for chassis rotation
+                yawR = 90 - yawR;
+                yawL = 90 + yawL;
+                c = 180 - yawR - yawL;
+                //find missing angle
+            
+                //convert values to radians
+                double radyawR = yawR * (Math.PI/180);
+                double radyawL = yawL *(Math.PI/180);
+                double radc = c * (Math.PI/180);
+
+                
+                //check if target is centered, offsetleft, or offset right
+                if(yawLB < 0 && yawRB > 0){
+                    //target centered between both cameras
+                    A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
+                    D = Math.sin(radyawL) * A;
+                    SmartDashboard.putNumber("dvalueCentered", D);
+                }
+                if(yawLB > 0 && yawRB > 0){
+                    //target is offset on the left
+                    A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
+                    D = A * Math.sin(radyawR);
+                    SmartDashboard.putNumber("dvalueLEFT", D);
+
+                }
+                if (yawLB < 0 && yawRB < 0){
+                    //target is offset on the right
+                    A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
+                    D = A * Math.sin(radyawL);
+                    SmartDashboard.putNumber("dvalueRiught", D);
+
+                }
+                SmartDashboard.putNumber("yawl", radyawL);
+                SmartDashboard.putNumber("yawR", radyawR);
+                SmartDashboard.putNumber("c", radc);
+
             }
         }
     }
