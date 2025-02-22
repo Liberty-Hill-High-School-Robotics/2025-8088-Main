@@ -284,15 +284,15 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public void TESTRUN(){
-    double distance = SmartDashboard.getNumber("distanceValue", 0);
-    double rotation = SmartDashboard.getNumber("angledegrese", 180);
-    double calc = TranslationPID.calculate(distance, 3.5);
-    double calcR = TranslationPID.calculate(m_gyro.getYaw().getValueAsDouble(), rotation);
+    double distance = SmartDashboard.getNumber("outputvalue", 0);
+    //double rotation = SmartDashboard.getNumber("angledegrese", 180);
+    double calc = TranslationPID.calculate(distance, 1);
+    //double calcR = TranslationPID.calculate(m_gyro.getYaw().getValueAsDouble(), rotation);
 
 
     var speeds = new ChassisSpeeds((-calc * DriveConstants.kMaxAngularSpeed),
                                    (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (calcR));
+                                   (0));
     //apply swerve module states
 
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));

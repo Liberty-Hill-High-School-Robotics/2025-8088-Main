@@ -31,6 +31,8 @@ public class Vision extends SubsystemBase {
     PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
     public final double xDistance = 0.356;
+    double D = 0;
+
 
 
     // The field from AprilTagFields will be different depending on the game.
@@ -137,7 +139,7 @@ public class Vision extends SubsystemBase {
                 double c;
                 double A;
                 double B;
-                double D;
+                double output;
                 double yawC = m_gyro.getYaw().getValueAsDouble();
                 yawC = Math.abs(yawC % 360);
                 //get yaw on a scale of 0-360
@@ -183,28 +185,32 @@ public class Vision extends SubsystemBase {
                 
                 //check if target is centered, offsetleft, or offset right
                 if(yawLB < 0 && yawRB > 0){
-                    //target centered between both cameras
+                    //robot centered between both cameras
                     A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
                     D = Math.sin(radyawL) * A;
                     SmartDashboard.putNumber("dvalueCentered", D);
+                    output = D;
                 }
-                if(yawLB > 0 && yawRB > 0){
-                    //target is offset on the left
+                if(yawLB < 0 && yawRB < 0){
+                    //robot is offset on the right
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
                     D = A * Math.sin(radyawR);
-                    SmartDashboard.putNumber("dvalueLEFT", D);
+                    SmartDashboard.putNumber("dvalueRight", D);
+                    output = D;
 
                 }
-                if (yawLB < 0 && yawRB < 0){
-                    //target is offset on the right
+                if (yawLB > 0 && yawRB > 0){
+                    //robot is offset on the left
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
                     D = A * Math.sin(radyawL);
-                    SmartDashboard.putNumber("dvalueRiught", D);
+                    SmartDashboard.putNumber("dvalueLeft", D);
+                    output = D;
 
                 }
                 SmartDashboard.putNumber("yawl", radyawL);
                 SmartDashboard.putNumber("yawR", radyawR);
                 SmartDashboard.putNumber("c", radc);
+                SmartDashboard.putNumber("outputvalue", D);
 
             }
         }
