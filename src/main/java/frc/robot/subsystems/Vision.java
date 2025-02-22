@@ -32,6 +32,11 @@ public class Vision extends SubsystemBase {
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
     public final double xDistance = 0.356;
     double D = 0;
+    boolean same = false;
+    double output;
+    double outputy;
+    double calcYaw = 0;
+
 
 
 
@@ -132,14 +137,24 @@ public class Vision extends SubsystemBase {
             var Lresult = LeftCamera.getLatestResult();
 
             if(Rresult.hasTargets() && Lresult.hasTargets()){
+
+                var LID = Lresult.getBestTarget().fiducialId;
+                var RID = Rresult.getBestTarget().fiducialId;
+                //check if targetID same
+                if(RID != LID){
+                    SmartDashboard.putString("targetsame", "NO");
+                }
+                else{
+                    SmartDashboard.putString("targetsame", "YES");
+                }
+
                 double yawR = Rresult.getBestTarget().yaw;
                 double yawL = Lresult.getBestTarget().yaw;
                 double yawRB = Rresult.getBestTarget().yaw;
                 double yawLB = Lresult.getBestTarget().yaw;
                 double c;
                 double A;
-                double B;
-                double output;
+                double Y;
                 double yawC = m_gyro.getYaw().getValueAsDouble();
                 yawC = Math.abs(yawC % 360);
                 //get yaw on a scale of 0-360
@@ -151,7 +166,6 @@ public class Vision extends SubsystemBase {
                     yawC = yawC % 90;
                     //return otherwise if not between 0 and 90
                 }
-
 
                 /*
                 * Math process:
@@ -169,6 +183,7 @@ public class Vision extends SubsystemBase {
                 * or
                 * tan(b) * B = D
                 * assuming C is the known side
+                //Y = (tan(yaw)) / x
                 */
 
                 //values adjusted for chassis rotation
@@ -188,6 +203,17 @@ public class Vision extends SubsystemBase {
                     //robot centered between both cameras
                     A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
                     D = Math.sin(radyawL) * A;
+                    Y = D / (Math.tan(radyawL));
+                    outputy = Y;
+                    if((xDistance / 2) > Y){
+                        outputy = (xDistance / 2) - Y;
+                    }
+                    else if((xDistance /2) < Y){
+                        outputy = Y - (xDistance / 2);
+                    }
+                    outputy = (xDistance / 2) - Y;
+
+
                     SmartDashboard.putNumber("dvalueCentered", D);
                     output = D;
                 }
@@ -195,6 +221,11 @@ public class Vision extends SubsystemBase {
                     //robot is offset on the right
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
                     D = A * Math.sin(radyawR);
+                    Y = D / (Math.tan(radyawL));
+                    outputy = Y;
+                    outputy = (xDistance / 2) + Y;
+
+
                     SmartDashboard.putNumber("dvalueRight", D);
                     output = D;
 
@@ -203,6 +234,9 @@ public class Vision extends SubsystemBase {
                     //robot is offset on the left
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
                     D = A * Math.sin(radyawL);
+                    Y = D / (Math.tan(radyawR));
+                    outputy = Y;
+                    outputy = (xDistance / 2) + Y;
                     SmartDashboard.putNumber("dvalueLeft", D);
                     output = D;
 
@@ -212,19 +246,41 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("c", radc);
                 SmartDashboard.putNumber("outputvalue", D);
 
+                //calculate yaw from ROBOT to target, using difference in yaw from cameras
+                Rotation2d chassisRotation2d= Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble());
+                if(yawLB > yawRB){
+                    calcYaw = yawLB - yawRB;
+                }
+                else if(yawLB < yawRB){
+                    calcYaw = yawRB - yawLB;
+                }
+                //get robot yaw to target
+                Rotation2d yawRobot = Rotation2d.fromDegrees(calcYaw);
+                //get target pose
+                Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(Rresult.getBestTarget().fiducialId);
+
+                //TODO calculate proper Y values for two cameras, do not use library stuff
+                //calculate camera to target translation using robot yaw and distance to target (x axis only)
+                var localpose = PhotonUtils.estimateCameraToTargetTranslation(output, yawRobot);
+                //calculate robot pose from the camera to target translation, given localpose, target pose, and gyro angle
+                var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
+                Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
+                //calculate true zero of robot given pose and offsets from camera? TODO
+                //
+                //get yaw to target given pose(s)
+                Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
+
+                SmartDashboard.putNumber("POSEFx", pose2D.getX());
+                SmartDashboard.putNumber("POSEFy", pose2D.getY());
+                SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
+                SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
+
+
             }
         }
     }
 
         
-
-        //calculate distance given pose
-        //double distanceToTarget = PhotonUtils.getDistanceToPose(RobotPose, targetPose);
-
-        // Calculate a translation from the camera to the target.
-        //needs distance
-        //Translation2d translation = PhotonUtils.estimateCameraToTargetTranslation(
-        //distanceToTarget, Rotation2d.fromDegrees(-besttarget.getYaw()));
 
 
         //-------------------------------------------------

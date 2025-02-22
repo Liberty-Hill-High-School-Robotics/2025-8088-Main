@@ -22,6 +22,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 package frc.robot;
 
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
@@ -80,6 +81,7 @@ public class RobotContainer {
     //Pathplanner auto chooser
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Mode", autoChooser); 
+    SmartDashboard.putNumber("robotcpu", RoboRioDataJNI.getCPUTemp());
 
     //Put the autons on the chooser and on SmartDashboard
     //example

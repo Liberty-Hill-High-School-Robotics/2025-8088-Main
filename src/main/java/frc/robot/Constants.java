@@ -91,7 +91,7 @@ public final class Constants {
     public static final double xP = 0.125;
     public static final double xI = 0;
     public static final double xD = 0;
-    public static final double yP = 0.1;
+    public static final double yP = 0.05;
     public static final double yI = 0;
     public static final double yD = 0;
 

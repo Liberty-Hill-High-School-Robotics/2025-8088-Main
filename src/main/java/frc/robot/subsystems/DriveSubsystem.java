@@ -73,10 +73,10 @@ public class DriveSubsystem extends SubsystemBase {
   
   //create holonomicdrivecontroller for path following
   HolonomicDriveController controller = new HolonomicDriveController(
-  new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD), 
-  new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD),
+  new PIDController(1, 0, 0), 
+  new PIDController(1, 0, 0),
   new ProfiledPIDController(1, 0, 0,
-    new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxSpeedMetersPerSecond)));
+    new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxAngularSpeed)));
 
 
   // Odometry class for tracking robot pose
@@ -285,14 +285,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void TESTRUN(){
     double distance = SmartDashboard.getNumber("outputvalue", 0);
-    //double rotation = SmartDashboard.getNumber("angledegrese", 180);
+    double rotation = SmartDashboard.getNumber("POSEYAW", 0);
     double calc = TranslationPID.calculate(distance, 1);
-    //double calcR = TranslationPID.calculate(m_gyro.getYaw().getValueAsDouble(), rotation);
+    double calcR = TranslationPID.calculate(rotation, 0);
 
 
-    var speeds = new ChassisSpeeds((-calc * DriveConstants.kMaxAngularSpeed),
+    var speeds = new ChassisSpeeds((-calc * DriveConstants.kMaxSpeedMetersPerSecond),
                                    (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (0));
+                                   (-calcR));
     //apply swerve module states
 
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
@@ -300,26 +300,34 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public void FullPIDControl(){
-    Pose2d end = new Pose2d(
+    Pose2d robotpose = new Pose2d(
+    SmartDashboard.getNumber("POSEFx", 0), 
+    SmartDashboard.getNumber("POSEFy", 0), 
+    Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
+    //^ only to be used in the controller.calculate line
+
+    Pose2d endpose = new Pose2d(
     SmartDashboard.getNumber("poseLXT", 0), 
     SmartDashboard.getNumber("poseLYT", 0), 
     Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0)));
 
-    Pose2d robotpose = new Pose2d(
-    SmartDashboard.getNumber("poseLX", 0), 
-    SmartDashboard.getNumber("poseLY", 0), 
-    Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLR", 0)));
+    Pose2d endpose2 = new Pose2d(0.6, 0.32, Rotation2d.fromDegrees(90));
+    Pose2d startpose2 = new Pose2d(0, 0, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
+
 
     List<Pose2d> poselist = new ArrayList<>();
-    poselist.add(end);
+    //poselist.add(startpose2);
     poselist.add(robotpose);
+    poselist.add(endpose2);
 
     PathConfig.setEndVelocity(0);
     PathConfig.setStartVelocity(0);
     var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig);
-    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), robotpose.getRotation());
-
+    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), endpose.getRotation());
+    //invert X (and y)
+    ChassisSpeeds adjustedspeeds = new ChassisSpeeds(
+      -controlledSpeeds.vxMetersPerSecond, controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
     //apply these speeds
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
   }
 }
