@@ -23,7 +23,7 @@ public class IntakeIn extends Command {
 
   @Override
   public void execute(){
-
+    m_coral.coralIn();
   }
 
   @Override 

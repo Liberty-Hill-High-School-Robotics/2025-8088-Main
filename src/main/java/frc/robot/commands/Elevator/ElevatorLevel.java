@@ -1,6 +1,5 @@
 package frc.robot.commands.Elevator;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.MotorSpeeds;
 import frc.robot.subsystems.Elevator;
 
 /**
@@ -8,12 +7,14 @@ import frc.robot.subsystems.Elevator;
  * pedagogical purposes. Actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.InstantCommand}.
  */
-public class ElevatorL1 extends Command {
+public class ElevatorLevel extends Command {
   // The subsystem the command runs on
   private final Elevator m_elevator;
+  double local;
 
-  public ElevatorL1(Elevator subsystem) {
+  public ElevatorLevel(Elevator subsystem, double setpoint) {
     m_elevator = subsystem;
+    local = setpoint;
     addRequirements(m_elevator);
   }
 
@@ -24,7 +25,7 @@ public class ElevatorL1 extends Command {
 
   @Override
   public void execute(){
-    m_elevator.elevatorL(MotorSpeeds.elevatorL1);
+    m_elevator.elevatorL(local);
   }
 
   @Override 

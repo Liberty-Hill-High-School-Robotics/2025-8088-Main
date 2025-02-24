@@ -29,6 +29,15 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
   public static final class visionData{
+  //xy coords offsets for each april tag
+  //17, 18, 19, 20, 21, 22 (blue)
+  //6, 7, 8, 9, 10 , 11 (red)
+  public static final double leftXOffset = 0;
+  public static final double rightXOffset = 0;
+  public static final double yOffset = 0;
+  public static final double rOffset = 0;
+
+
 
   public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33655, -0.1778, 0.229), new Rotation3d(0,90,0));
   public static final double leftCamHeight = robotToCamLeft.getZ();
@@ -73,11 +82,11 @@ public final class Constants {
     //encoder values for each setpoint, assuming bottom is 0
     //top of elevator is around encoder count = 28
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
-    public static final double elevatorL0 = 1;
-    public static final double elevatorL1 = -23;
-    public static final double elevatorL2 = -5;
-    public static final double elevatorL3 = -10;
-    public static final double elevatorL4 = -15;
+    public static final double elevatorL0 = -1;
+    public static final double elevatorL1 = -10;
+    public static final double elevatorL2 = -15;
+    public static final double elevatorL3 = -20;
+    public static final double elevatorL4 = -28.5;
 
     public static final double elevatorSpeed = .2;
     public static final double elevatorSpeedDown = .085;
@@ -104,6 +113,10 @@ public final class Constants {
 
 
   public static final class DriveConstants {
+    public static final double basicDriveRatio = 0.8;
+    public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is 
+    public static final double elevatorHeightSlow = -10; //height to slow down after, in encoder counts (must be negative)
+
 
 
 

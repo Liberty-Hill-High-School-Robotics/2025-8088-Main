@@ -144,10 +144,9 @@ public class Vision extends SubsystemBase {
                 if(RID != LID){
                     SmartDashboard.putString("targetsame", "NO");
                 }
+                //if targets are same //TODO
                 else{
-                    SmartDashboard.putString("targetsame", "YES");
-                }
-
+                SmartDashboard.putString("targetsame", "YES");
                 double yawR = Rresult.getBestTarget().yaw;
                 double yawL = Lresult.getBestTarget().yaw;
                 double yawRB = Rresult.getBestTarget().yaw;
@@ -274,13 +273,11 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("POSEFy", pose2D.getY());
                 SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
                 SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
-
-
+                }
             }
         }
     }
 
-        
 
 
         //-------------------------------------------------

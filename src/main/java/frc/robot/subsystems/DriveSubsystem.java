@@ -40,6 +40,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class DriveSubsystem extends SubsystemBase {
   RobotConfig driveConfig;
+  boolean rightoffset = false;
 
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
@@ -271,6 +272,11 @@ public class DriveSubsystem extends SubsystemBase {
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
     setModuleStates(
       DriveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds));
+  }
+
+  public boolean rightOffset(boolean value) {
+    rightoffset = value;
+    return rightoffset;
   }
 
 

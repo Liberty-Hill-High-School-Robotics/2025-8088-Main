@@ -23,6 +23,7 @@ public class IntakeOut extends Command {
 
   @Override
   public void execute(){
+    m_coral.coralOut();
 
   }
 

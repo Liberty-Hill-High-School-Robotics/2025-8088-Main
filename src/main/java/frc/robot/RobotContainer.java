@@ -25,6 +25,8 @@ package frc.robot;
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MotorSpeeds;
 import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -40,7 +42,7 @@ import frc.robot.subsystems.*;
 //Command imports
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
-import frc.robot.commands.Elevator.ElevatorL1;
+import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
 
@@ -142,12 +144,23 @@ public class RobotContainer {
     //makes it slower or faster depending on output of button
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
-        var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : .8;
+        var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : DriveConstants.basicDriveRatio;
+        //check if elevator is high, if so, mutliply robot speed by variable (should halve speed or similar)
+        boolean elevatorheight = false;
+        double elevatorSlowRatio = 1;
+
+        if(m_elevator.elevatorEncoderGet() > DriveConstants.elevatorHeightSlow){
+          elevatorheight = true;
+        }
+        if(elevatorheight){
+          elevatorSlowRatio = DriveConstants.elevatorSpeedRatio;
+        }
+
         m_drivesubsystem.drive(
           //inputs from joystick to drive system
-          -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio,
-          -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio,
-          -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+          -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
+          -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
+          -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband) * elevatorSlowRatio,
           false); },
           m_drivesubsystem));
   }
@@ -169,17 +182,31 @@ public class RobotContainer {
      * commandname.toggleontrue(new commandname(m_subsystem(s)));
      */
 
-     final Trigger AlignXButton = m_driverController.b();
+     final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
 
-     final Trigger ElevatorUp = m_driverController.y();
+     final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());
      ElevatorUp.whileTrue(new ElevatorUp(m_elevator));
 
-     final Trigger ElevatorDown = m_driverController.a();
+     final Trigger ElevatorDown = m_driverController.a().and(m_driverController.leftBumper().negate());
      ElevatorDown.whileTrue(new ElevatorDown(m_elevator));
 
-     final Trigger ElevatorL1 = m_driverController.x();
-     ElevatorL1.whileTrue(new ElevatorL1(m_elevator));
+
+     //elevator setpoints
+     final Trigger ElevatorL4 = m_driverController.leftBumper().and(m_driverController.y());
+     ElevatorL4.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
+
+     final Trigger ElevatorL3 = m_driverController.leftBumper().and(m_driverController.b());
+     ElevatorL3.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL3));
+
+     final Trigger ElevatorL2 = m_driverController.leftBumper().and(m_driverController.x());
+     ElevatorL2.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
+
+     final Trigger ElevatorL1 = m_driverController.leftBumper().and(m_driverController.a());
+     ElevatorL1.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL1));
+
+     //left/right offsets
+
   }
 
   /**
