@@ -40,6 +40,7 @@ import frc.robot.subsystems.*;
 //Command imports
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
+import frc.robot.commands.Elevator.ElevatorL1;
 import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
 
@@ -176,6 +177,9 @@ public class RobotContainer {
 
      final Trigger ElevatorDown = m_driverController.a();
      ElevatorDown.whileTrue(new ElevatorDown(m_elevator));
+
+     final Trigger ElevatorL1 = m_driverController.x();
+     ElevatorL1.whileTrue(new ElevatorL1(m_elevator));
   }
 
   /**

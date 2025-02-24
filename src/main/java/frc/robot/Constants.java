@@ -63,16 +63,25 @@ public final class Constants {
   }
 
   public static final class MotorSpeeds{
-    public static final double eP = 0.05;
+    public static final double eP = 0.075;
     public static final double eI = 0;
     public static final double eD = 0;
+    //slower pid values for going down
+    public static final double edP = 0.01;
+    public static final double edI = 0;
+    public static final double edD = 0;
     //encoder values for each setpoint, assuming bottom is 0
-    public static final double elevatorL1 = 10;
-    public static final double elevatorL2 = 10;
-    public static final double elevatorL3 = 10;
-    public static final double elevatorL4 = 10;
+    //top of elevator is around encoder count = 28
+    //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
+    public static final double elevatorL0 = 1;
+    public static final double elevatorL1 = -23;
+    public static final double elevatorL2 = -5;
+    public static final double elevatorL3 = -10;
+    public static final double elevatorL4 = -15;
 
-    public static final double elevatorSpeed = .1;
+    public static final double elevatorSpeed = .2;
+    public static final double elevatorSpeedDown = .085;
+
     public static final double coralSpeed = .2;
 
   }
