@@ -1,11 +1,15 @@
 package frc.robot.subsystems;
 
 
+import javax.naming.spi.NamingManager;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
@@ -14,6 +18,8 @@ import frc.robot.Constants.MotorSpeeds;
 
 
 public class Elevator extends SubsystemBase {
+
+    PIDController ElevatorPID = new PIDController(MotorSpeeds.eP, MotorSpeeds.eI, MotorSpeeds.eD);
 
     //motors & variables here, define them and create any PIDs needed
     private SparkMax elevatorSparkMax;
@@ -26,7 +32,7 @@ public class Elevator extends SubsystemBase {
         //config motor settings here
         elevatorSparkMax = new SparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
         elevatorBottomLimit = elevatorSparkMax.getReverseLimitSwitch();
-        elevatorTopLimit = elevatorSparkMax.getForwardLimitSwitch();
+        //elevatorTopLimit = elevatorSparkMax.getForwardLimitSwitch();
         
         //elevatorRelativeEncoder.
         elevatorRelativeEncoder = elevatorSparkMax.getEncoder();
@@ -38,6 +44,9 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         //This method will be called once per scheduler run
         //Put smartdashboard stuff, check for limit switches
+        SmartDashboard.putBoolean("elevatorbottom", elevatorAtBottomLimit());
+        SmartDashboard.putNumber("elevatorencoder", elevatorEncoderGet());
+
     }
 
     @Override
@@ -61,6 +70,12 @@ public class Elevator extends SubsystemBase {
         elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
     }
 
+    //elevator setpoints
+    public void elevatorL(double setpoint){
+        double calc = ElevatorPID.calculate(elevatorRelativeEncoder.getPosition(), setpoint);
+        elevatorSparkMax.set(calc);
+    }
+
     public void elevatorStop(){
         elevatorSparkMax.stopMotor();
     }
@@ -70,7 +85,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean elevatorAtTopLimit(){
-        return elevatorTopLimit.isPressed();
+        //return elevatorTopLimit.isPressed();
+        return false; 
     }
 
     public double elevatorEncoderGet(){

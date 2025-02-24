@@ -39,6 +39,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.*;
 //Command imports
 import frc.robot.commands.Drive.*;
+import frc.robot.commands.Elevator.ElevatorDown;
+import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
 
 
@@ -105,6 +107,7 @@ public class RobotContainer {
 
 
     //Elevator Exports
+    SmartDashboard.putData("elevator up", new ElevatorUp(m_elevator));
     
 
     //GroundIntake Exports
@@ -167,6 +170,12 @@ public class RobotContainer {
 
      final Trigger AlignXButton = m_driverController.b();
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
+
+     final Trigger ElevatorUp = m_driverController.y();
+     ElevatorUp.whileTrue(new ElevatorUp(m_elevator));
+
+     final Trigger ElevatorDown = m_driverController.a();
+     ElevatorDown.whileTrue(new ElevatorDown(m_elevator));
   }
 
   /**

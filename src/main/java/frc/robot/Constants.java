@@ -63,6 +63,15 @@ public final class Constants {
   }
 
   public static final class MotorSpeeds{
+    public static final double eP = 0.05;
+    public static final double eI = 0;
+    public static final double eD = 0;
+    //encoder values for each setpoint, assuming bottom is 0
+    public static final double elevatorL1 = 10;
+    public static final double elevatorL2 = 10;
+    public static final double elevatorL3 = 10;
+    public static final double elevatorL4 = 10;
+
     public static final double elevatorSpeed = .1;
     public static final double coralSpeed = .2;
 

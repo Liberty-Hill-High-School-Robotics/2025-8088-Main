@@ -33,6 +33,7 @@ public class ElevatorUp extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_elevator.elevatorAtTopLimit();
+    //return m_elevator.elevatorAtTopLimit();
+    return false;
   }
 }
