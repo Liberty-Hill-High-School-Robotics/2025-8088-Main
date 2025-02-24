@@ -79,9 +79,9 @@ public class Vision extends SubsystemBase {
                 //get all usable data from target:
                 //yaw, pitch, area, ID, pose, height
                 PhotonTrackedTarget Lbesttarget = Lresult.getBestTarget();
-                double Lyaw = Lbesttarget.getYaw();
-                double Lpitch = Lbesttarget.getPitch();
-                double Larea = Lbesttarget.getArea();
+               // double Lyaw = Lbesttarget.getYaw();
+               // double Lpitch = Lbesttarget.getPitch();
+                //double Larea = Lbesttarget.getArea();
                 int LtargetID = Lbesttarget.getFiducialId();
                 Optional<Pose3d> Ltargetpose = aprilTagFieldLayout.getTagPose(LtargetID);
                 double Ltargetheight = Ltargetpose.get().getMeasureZ().abs(Meter);
@@ -110,9 +110,9 @@ public class Vision extends SubsystemBase {
                 //get all usable data from target:
                 //yaw, pitch, area, ID, pose, height
                 PhotonTrackedTarget Rbesttarget = Rresult.getBestTarget();
-                double Ryaw = Rbesttarget.getYaw();
-                double Rpitch = Rbesttarget.getPitch();
-                double Rarea = Rbesttarget.getArea();
+                //double Ryaw = Rbesttarget.getYaw();
+                //double Rpitch = Rbesttarget.getPitch();
+                //double Rarea = Rbesttarget.getArea();
                 int RtargetID = Rbesttarget.getFiducialId();
                 Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(RtargetID);
                 double Rtargetheight = Rtargetpose.get().getMeasureZ().abs(Meter);
@@ -247,7 +247,7 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("outputvalue", D);
 
                 //calculate yaw from ROBOT to target, using difference in yaw from cameras
-                Rotation2d chassisRotation2d= Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble());
+                //Rotation2d chassisRotation2d= Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble());
                 if(yawLB > yawRB){
                     calcYaw = yawLB - yawRB;
                 }
@@ -255,15 +255,15 @@ public class Vision extends SubsystemBase {
                     calcYaw = yawRB - yawLB;
                 }
                 //get robot yaw to target
-                Rotation2d yawRobot = Rotation2d.fromDegrees(calcYaw);
+                //Rotation2d yawRobot = Rotation2d.fromDegrees(calcYaw);
                 //get target pose
                 Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(Rresult.getBestTarget().fiducialId);
 
                 //TODO calculate proper Y values for two cameras, do not use library stuff
                 //calculate camera to target translation using robot yaw and distance to target (x axis only)
-                var localpose = PhotonUtils.estimateCameraToTargetTranslation(output, yawRobot);
+                //var localpose = PhotonUtils.estimateCameraToTargetTranslation(output, yawRobot);
                 //calculate robot pose from the camera to target translation, given localpose, target pose, and gyro angle
-                var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
+                //var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
                 Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
                 //calculate true zero of robot given pose and offsets from camera? TODO
                 //

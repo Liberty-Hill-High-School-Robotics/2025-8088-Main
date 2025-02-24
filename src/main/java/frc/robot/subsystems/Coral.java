@@ -1,38 +1,22 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.MotorSpeeds;
 
 
 
 public class Coral extends SubsystemBase {
+    private SparkMax coralMotor;
 
-    //motors & variables here, define them and create any PIDs needed
-    /* ex:
-    private CANSparkMax barRotatorSparkMax;
-    private SparkLimitSwitch barReverseLimitSwitch;
-    public static RelativeEncoder barRotatorRelativeEncoder;
-    PIDController barPID = new PIDController(BarConstants.bP, BarConstants.bI, BarConstants.bD);
-    */
 
     public Coral(){
         //config motor settings here
-
-        /*
-        ex:
-        barRotatorSparkMax = new CANSparkMax(CanIDs.barRotatorID, MotorType.kBrushless);
-        //barRotatorSparkMax.restoreFactoryDefaults();
-        barRotatorSparkMax.setInverted(true);
-        barRotatorSparkMax.setIdleMode(IdleMode.kBrake);
-        barRotatorSparkMax.setSmartCurrentLimit(40);
-
-        barReverseLimitSwitch = barRotatorSparkMax.getReverseLimitSwitch(Type.kNormallyOpen);
-
-        barRotatorSparkMax.enableSoftLimit(SoftLimitDirection.kForward, true);
-        barRotatorSparkMax.setSoftLimit(SoftLimitDirection.kForward, BarConstants.fLimit);
-
-        barRotatorRelativeEncoder = barRotatorSparkMax.getEncoder();
-        */
+        coralMotor = new SparkMax(CanIDs.coralMotorID, MotorType.kBrushless);        
     }
 
   
@@ -56,10 +40,16 @@ public class Coral extends SubsystemBase {
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
 
-    public void ___(){
-        //motor.set(PID.calculate(position, setpoint));
-        //motor.set(number);
-        
+    public void coralOut(){
+        coralMotor.set(MotorSpeeds.coralSpeed);
+    }
+
+    public void coralIn(){
+        coralMotor.set(-MotorSpeeds.coralSpeed);
+    }
+
+    public void coralStop(){
+        coralMotor.stopMotor();
     }
 
 }

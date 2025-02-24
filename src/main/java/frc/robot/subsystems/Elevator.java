@@ -17,9 +17,7 @@ public class Elevator extends SubsystemBase {
 
     //motors & variables here, define them and create any PIDs needed
     private SparkMax elevatorSparkMax;
-    private SparkMax elevatorSparkMax2;
     private RelativeEncoder elevatorRelativeEncoder;
-    private RelativeEncoder elevatorRelativeEncoder2;
     private SparkLimitSwitch elevatorBottomLimit;
     private SparkLimitSwitch elevatorTopLimit;
 
@@ -28,13 +26,10 @@ public class Elevator extends SubsystemBase {
         //config motor settings here
         elevatorSparkMax = new SparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
         elevatorBottomLimit = elevatorSparkMax.getReverseLimitSwitch();
-
-        elevatorSparkMax2 = new SparkMax(CanIDs.elevatorMotor2ID, MotorType.kBrushless);
-        elevatorTopLimit = elevatorSparkMax2.getForwardLimitSwitch();
+        elevatorTopLimit = elevatorSparkMax.getForwardLimitSwitch();
         
         //elevatorRelativeEncoder.
         elevatorRelativeEncoder = elevatorSparkMax.getEncoder();
-        elevatorRelativeEncoder2 = elevatorSparkMax2.getEncoder();
     }
 
   
@@ -60,16 +55,13 @@ public class Elevator extends SubsystemBase {
 
     public void elevatorUp(){
         elevatorSparkMax.set(MotorSpeeds.elevatorSpeed);
-        elevatorSparkMax.set(MotorSpeeds.elevatorSpeed);
     }
 
     public void elevatorDown(){
         elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
-        elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
     }
 
     public void elevatorStop(){
-        elevatorSparkMax.stopMotor();
         elevatorSparkMax.stopMotor();
     }
 
@@ -79,5 +71,9 @@ public class Elevator extends SubsystemBase {
 
     public boolean elevatorAtTopLimit(){
         return elevatorTopLimit.isPressed();
+    }
+
+    public double elevatorEncoderGet(){
+        return elevatorRelativeEncoder.getPosition();
     }
 }

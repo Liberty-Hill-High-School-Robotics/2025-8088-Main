@@ -131,6 +131,8 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("gyrovalue", getHeading());
+    //update odometry if vision exists
+    UpdateODO();
     
     // Update the odometry in the periodic block
     m_odometry.update(
@@ -312,7 +314,7 @@ public class DriveSubsystem extends SubsystemBase {
     Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0)));
 
     Pose2d endpose2 = new Pose2d(0.6, 0.32, Rotation2d.fromDegrees(90));
-    Pose2d startpose2 = new Pose2d(0, 0, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
+    //Pose2d startpose2 = new Pose2d(0, 0, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
 
 
     List<Pose2d> poselist = new ArrayList<>();
@@ -330,4 +332,27 @@ public class DriveSubsystem extends SubsystemBase {
     //apply these speeds
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
   }
+
+  //update odometry using vision pose IF it exists
+  public void UpdateODO(){
+    //get vision pose, values = 0 if DNE
+    double VisionX = SmartDashboard.getNumber("POSEFx", 0);
+    double VisionY = SmartDashboard.getNumber("POSEFy", 0);
+    //create pose2d object using vision pose
+    Pose2d VisionPose = new Pose2d(VisionX, VisionY, m_gyro.getRotation2d());
+
+    //check if pose exists
+    if(VisionX != 0 && VisionY != 0){
+      //update m_odo using gyro, encoders, and vision pose
+      m_odometry.resetPosition(
+      Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
+      new SwerveModulePosition[]{
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()},
+      VisionPose);
+    }
+  }
+
 }

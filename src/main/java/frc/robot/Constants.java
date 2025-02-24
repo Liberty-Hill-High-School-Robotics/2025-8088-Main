@@ -57,13 +57,15 @@ public final class Constants {
     public static final int BlinkinPWMPort = 0;
     public static final int GyroID = 9;
     public static final int elevatorMotorID = 10;
-    public static final int elevatorMotor2ID = 11;
+    public static final int coralMotorID = 11;
 
 
   }
 
   public static final class MotorSpeeds{
-    public static final double elevatorSpeed = 1;
+    public static final double elevatorSpeed = .1;
+    public static final double coralSpeed = .2;
+
   }
 
   public static final class ColorConstants{
