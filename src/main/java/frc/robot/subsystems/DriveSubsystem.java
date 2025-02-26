@@ -131,9 +131,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("gyrovalue", getHeading());
-    //update odometry if vision exists
     UpdateODO();
+
+    SmartDashboard.putNumber("gyrovalue", getHeading());
+    SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("drivetrainposeY", m_odometry.getPoseMeters().getY());
+    //update odometry if vision exists
     
     // Update the odometry in the periodic block
     m_odometry.update(
@@ -244,6 +247,7 @@ public class DriveSubsystem extends SubsystemBase {
    * Returns the heading of the robot.
    *
    * @return the robot's heading in degrees, from -180 to 180
+   *    
    */
   public double getHeading() {
     return Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()).getDegrees();
@@ -308,43 +312,36 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public void FullPIDControl(){
-    Pose2d robotpose = new Pose2d(
-    SmartDashboard.getNumber("POSEFx", 0), 
-    SmartDashboard.getNumber("POSEFy", 0), 
-    Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
-    //^ only to be used in the controller.calculate line
-
-    Pose2d endpose = new Pose2d(
-    SmartDashboard.getNumber("poseLXT", 0), 
-    SmartDashboard.getNumber("poseLYT", 0), 
-    Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0)));
-
     //create offset values (tag relative) whether or not the operator wants left/right offset
     Pose2d FINALPOSE;
     if(rightoffset){
-      FINALPOSE = new Pose2d(DriveConstants.rightXOffset, DriveConstants.yOffset, 
-      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+      //FINALPOSE = new Pose2d(DriveConstants.rightXOffset, DriveConstants.yOffset, 
+      //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
     }
     else{
-      FINALPOSE = new Pose2d(DriveConstants.leftXOffset, DriveConstants.yOffset, 
-      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+      //FINALPOSE = new Pose2d(DriveConstants.leftXOffset, DriveConstants.yOffset, 
+      //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
     }
+
+    FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(-130));
 
 
     List<Pose2d> poselist = new ArrayList<>();
-    poselist.add(robotpose);
+    poselist.add(m_odometry.getPoseMeters());
     poselist.add(FINALPOSE);
 
     PathConfig.setEndVelocity(0); //should always be zero
     PathConfig.setStartVelocity(0); //tbd (messing with values rn)
     var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
     //create chassisspeed class with the traj.
-    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), endpose.getRotation());
+    ChassisSpeeds controlledSpeeds = controller.calculate(m_odometry.getPoseMeters(), trajectory.sample(trajectory.getTotalTimeSeconds()), FINALPOSE.getRotation());
     //invert X (and y)
     ChassisSpeeds adjustedspeeds = new ChassisSpeeds(
       -controlledSpeeds.vxMetersPerSecond, controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
     //apply these speeds
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
+    //if(m_odometry.getPoseMeters() != FINALPOSE){
+      setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
+    //}
   }
 
   //update odometry using vision pose IF it exists
@@ -358,18 +355,8 @@ public class DriveSubsystem extends SubsystemBase {
     //check if pose exists
     if(VisionX != 0 && VisionY != 0){
       //update m_odo using gyro, encoders, and vision pose
-      m_odometry.resetPosition(
-      Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
-      new SwerveModulePosition[]{
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()},
-      VisionPose);
+      m_odometry.resetPose(VisionPose);
     }
-    SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("drivetrainposeY", m_odometry.getPoseMeters().getY());
-
   }
 
 }

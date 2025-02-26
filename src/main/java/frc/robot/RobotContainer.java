@@ -144,6 +144,8 @@ public class RobotContainer {
     //makes it slower or faster depending on output of button
 
    // m_elevator.setDefaultCommand(new ElevatorDownDefault(m_elevator));
+    m_elevator.setDefaultCommand(
+    new RunCommand(() -> {m_elevator.elevatorStopDefault();}, m_elevator));
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {

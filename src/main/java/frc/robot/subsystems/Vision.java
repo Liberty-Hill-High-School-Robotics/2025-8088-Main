@@ -207,7 +207,7 @@ public class Vision extends SubsystemBase {
                     A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
                     D = Math.sin(radyawL) * A;
                     Y = D / (Math.tan(radyawL));
-                    outputy = xLeftOffset - Y;
+                    outputy = Y + xLeftOffset;
                     output = D;
 
                     SmartDashboard.putNumber("dvalueCentered", D);
@@ -217,7 +217,7 @@ public class Vision extends SubsystemBase {
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
                     D = A * Math.sin(radyawR);
                     Y = D / (Math.tan(radyawL));
-                    outputy = xLeftOffset - Y;
+                    outputy = Y + xLeftOffset;
                     output = D;
 
                     SmartDashboard.putNumber("dvalueRight", D);
@@ -228,7 +228,8 @@ public class Vision extends SubsystemBase {
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
                     D = A * Math.sin(radyawL);
                     Y = D / (Math.tan(radyawR));
-                    outputy = xRightOffset - Y;
+                    
+                    outputy = (-Y) + xRightOffset;
                     output = D;
 
                     SmartDashboard.putNumber("dvalueLeft", D);
@@ -262,6 +263,10 @@ public class Vision extends SubsystemBase {
                 //
                 //get yaw to target given pose(s)
                 Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
+
+                if(!Lresult.hasTargets() && !Rresult.hasTargets()){
+                    pose2D = new Pose2d(0, 0, m_gyro.getRotation2d());
+                }
 
                 SmartDashboard.putNumber("POSEFx", pose2D.getX());
                 SmartDashboard.putNumber("POSEFy", pose2D.getY());
