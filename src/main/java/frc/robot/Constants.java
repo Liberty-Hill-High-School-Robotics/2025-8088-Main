@@ -61,6 +61,7 @@ public final class Constants {
   public static final class CanIDs{
     //can IDs
     public static final int BlinkinPWMPort = 0;
+    public static final int BeamDIOPort = 0;
     public static final int GyroID = 9;
     public static final int elevatorMotorID = 10;
     public static final int coralMotorID = 11;
@@ -84,7 +85,7 @@ public final class Constants {
     public static final double elevatorSpeed = .5;
     public static final double elevatorSpeedDown = .6;
 
-    public static final double coralSpeed = .2;
+    public static final double coralSpeed = -.05;
 
   }
 

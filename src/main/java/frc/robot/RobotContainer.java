@@ -39,11 +39,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 //Subsystem imports
 import frc.robot.subsystems.*;
-import frc.robot.commands.Coral.IntakeOut;
-//Command imports
+//Command importsx
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
-import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
@@ -192,6 +190,9 @@ public class RobotContainer {
 
      final Trigger CoralIN = m_driverController.rightBumper();
      CoralIN.whileTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
+
+     final Trigger CoralOUT = m_driverController.back();
+     CoralOUT.whileTrue(new frc.robot.commands.Coral.IntakeOut(m_coral));
 
 
      final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());

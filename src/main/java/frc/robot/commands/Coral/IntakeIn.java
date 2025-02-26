@@ -28,11 +28,11 @@ public class IntakeIn extends Command {
 
   @Override 
   public void end(boolean interrupted){
-
+    m_coral.coralStop();
    }
 
   @Override
   public boolean isFinished() {
-    return false;
+    return m_coral.coralGetBeam();
   }
 }

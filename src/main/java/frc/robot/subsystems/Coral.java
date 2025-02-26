@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
@@ -12,6 +15,9 @@ import frc.robot.Constants.MotorSpeeds;
 
 public class Coral extends SubsystemBase {
     private SparkMax coralMotor;
+    public static DigitalInput throughSensor = new DigitalInput(CanIDs.BeamDIOPort);
+
+
 
 
     public Coral(){
@@ -25,6 +31,7 @@ public class Coral extends SubsystemBase {
     public void periodic() {
         //This method will be called once per scheduler run
         //Put smartdashboard stuff, check for limit switches
+        SmartDashboard.putBoolean("beam", throughSensor.get());
     }
 
     @Override
@@ -41,7 +48,7 @@ public class Coral extends SubsystemBase {
     //return true/false if limit is true, or encoder >= x value
 
     public void coralOut(){
-        coralMotor.set(MotorSpeeds.coralSpeed);
+        coralMotor.set(-MotorSpeeds.coralSpeed);
     }
 
     public void coralIn(){
@@ -50,6 +57,10 @@ public class Coral extends SubsystemBase {
 
     public void coralStop(){
         coralMotor.stopMotor();
+    }
+
+    public boolean coralGetBeam(){
+        return !throughSensor.get();
     }
 
 }

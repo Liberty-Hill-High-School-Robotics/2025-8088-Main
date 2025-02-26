@@ -367,6 +367,9 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()},
       VisionPose);
     }
+    SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("drivetrainposeY", m_odometry.getPoseMeters().getY());
+
   }
 
 }
