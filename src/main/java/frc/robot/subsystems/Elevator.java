@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MotorSpeeds;
 
 
@@ -17,7 +18,6 @@ import frc.robot.Constants.MotorSpeeds;
 public class Elevator extends SubsystemBase {
 
     PIDController ElevatorPID = new PIDController(MotorSpeeds.eP, MotorSpeeds.eI, MotorSpeeds.eD);
-    PIDController ElevatorDownPID = new PIDController(MotorSpeeds.edP, MotorSpeeds.edI, MotorSpeeds.edD);
 
 
     //motors & variables here, define them and create any PIDs needed
@@ -79,12 +79,17 @@ public class Elevator extends SubsystemBase {
     }
 
     public void elevatorStop(){
+        elevatorSparkMax.stopMotor();
+    }
+
+    public void elevatorStopDefault(){
         double elevatorpos = elevatorRelativeEncoder.getPosition();
-        if(elevatorpos <= -2){
-            elevatorSparkMax.set(MotorSpeeds.elevatorSpeedDown);
+        if(elevatorpos > DriveConstants.elevatorHeightOff){
+            elevatorSparkMax.stopMotor();
         }
         else{
-            elevatorSparkMax.stopMotor();
+            double calc = ElevatorPID.calculate(elevatorRelativeEncoder.getPosition(), DriveConstants.elevatorHeightOff);
+            elevatorSparkMax.set(calc);
         }
     }
 

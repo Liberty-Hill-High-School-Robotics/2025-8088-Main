@@ -319,18 +319,26 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.getNumber("poseLYT", 0), 
     Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0)));
 
-    Pose2d endpose2 = new Pose2d(0.6, 0.32, Rotation2d.fromDegrees(90));
-    //Pose2d startpose2 = new Pose2d(0, 0, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
+    //create offset values (tag relative) whether or not the operator wants left/right offset
+    Pose2d FINALPOSE;
+    if(rightoffset){
+      FINALPOSE = new Pose2d(DriveConstants.rightXOffset, DriveConstants.yOffset, 
+      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
+    else{
+      FINALPOSE = new Pose2d(DriveConstants.leftXOffset, DriveConstants.yOffset, 
+      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
 
 
     List<Pose2d> poselist = new ArrayList<>();
-    //poselist.add(startpose2);
     poselist.add(robotpose);
-    poselist.add(endpose2);
+    poselist.add(FINALPOSE);
 
-    PathConfig.setEndVelocity(0);
-    PathConfig.setStartVelocity(0);
-    var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig);
+    PathConfig.setEndVelocity(0); //should always be zero
+    PathConfig.setStartVelocity(0); //tbd (messing with values rn)
+    var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
+    //create chassisspeed class with the traj.
     ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), endpose.getRotation());
     //invert X (and y)
     ChassisSpeeds adjustedspeeds = new ChassisSpeeds(

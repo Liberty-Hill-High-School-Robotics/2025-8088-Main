@@ -27,9 +27,13 @@ import frc.robot.Constants.visionData;
 public class Vision extends SubsystemBase {
 
     //make sure the name in quotes is EXACTLY the same as it is in PV
-    PhotonCamera LeftCamera = new PhotonCamera("USB CAM 1 (High)");
-    PhotonCamera RightCamera = new PhotonCamera("USB CAM 2 (High)");
+    PhotonCamera LeftCamera = new PhotonCamera("USB CAM L (High)");
+    PhotonCamera RightCamera = new PhotonCamera("USB CAM R (High)");
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
+
+    public final double xLeftOffset = visionData.robotToCamLeft.getY();
+    public final double xRightOffset = visionData.robotToCamRight.getY();
+
     public final double xDistance = 0.356;
     double D = 0;
     boolean same = false;
@@ -198,35 +202,25 @@ public class Vision extends SubsystemBase {
 
                 
                 //check if target is centered, offsetleft, or offset right
-                if(yawLB < 0 && yawRB > 0){
+                if(yawLB > 0 && yawRB < 0){
                     //robot centered between both cameras
                     A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
                     D = Math.sin(radyawL) * A;
                     Y = D / (Math.tan(radyawL));
-                    outputy = Y;
-                    if((xDistance / 2) > Y){
-                        outputy = (xDistance / 2) - Y;
-                    }
-                    else if((xDistance /2) < Y){
-                        outputy = Y - (xDistance / 2);
-                    }
-                    outputy = (xDistance / 2) - Y;
-
+                    outputy = xLeftOffset - Y;
+                    output = D;
 
                     SmartDashboard.putNumber("dvalueCentered", D);
-                    output = D;
                 }
                 if(yawLB < 0 && yawRB < 0){
                     //robot is offset on the right
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
                     D = A * Math.sin(radyawR);
                     Y = D / (Math.tan(radyawL));
-                    outputy = Y;
-                    outputy = (xDistance / 2) + Y;
-
+                    outputy = xLeftOffset - Y;
+                    output = D;
 
                     SmartDashboard.putNumber("dvalueRight", D);
-                    output = D;
 
                 }
                 if (yawLB > 0 && yawRB > 0){
@@ -234,12 +228,12 @@ public class Vision extends SubsystemBase {
                     A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
                     D = A * Math.sin(radyawL);
                     Y = D / (Math.tan(radyawR));
-                    outputy = Y;
-                    outputy = (xDistance / 2) + Y;
-                    SmartDashboard.putNumber("dvalueLeft", D);
+                    outputy = xRightOffset - Y;
                     output = D;
 
+                    SmartDashboard.putNumber("dvalueLeft", D);
                 }
+
                 SmartDashboard.putNumber("yawl", radyawL);
                 SmartDashboard.putNumber("yawR", radyawR);
                 SmartDashboard.putNumber("c", radc);

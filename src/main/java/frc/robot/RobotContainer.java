@@ -39,9 +39,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 //Subsystem imports
 import frc.robot.subsystems.*;
+import frc.robot.commands.Coral.IntakeOut;
 //Command imports
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
+import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
@@ -142,6 +144,9 @@ public class RobotContainer {
     // Turning is controlled by the X axis of the right stick.
     //outputs are multiplied by a boolean controlled by a button on the driver controller
     //makes it slower or faster depending on output of button
+
+   // m_elevator.setDefaultCommand(new ElevatorDownDefault(m_elevator));
+
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
         var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : DriveConstants.basicDriveRatio;
@@ -149,7 +154,7 @@ public class RobotContainer {
         boolean elevatorheight = false;
         double elevatorSlowRatio = 1;
 
-        if(m_elevator.elevatorEncoderGet() > DriveConstants.elevatorHeightSlow){
+        if(m_elevator.elevatorEncoderGet() < DriveConstants.elevatorHeightSlow){
           elevatorheight = true;
         }
         if(elevatorheight){
@@ -184,6 +189,10 @@ public class RobotContainer {
 
      final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
+
+     final Trigger CoralIN = m_driverController.rightBumper();
+     CoralIN.whileTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
+
 
      final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());
      ElevatorUp.whileTrue(new ElevatorUp(m_elevator));

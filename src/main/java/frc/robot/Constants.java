@@ -32,30 +32,27 @@ public final class Constants {
   //xy coords offsets for each april tag
   //17, 18, 19, 20, 21, 22 (blue)
   //6, 7, 8, 9, 10 , 11 (red)
-  public static final double leftXOffset = 0;
-  public static final double rightXOffset = 0;
-  public static final double yOffset = 0;
-  public static final double rOffset = 0;
 
 
 
-  public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.33655, -0.1778, 0.229), new Rotation3d(0,90,0));
+
+  public static final Transform3d robotToCamLeft = new Transform3d(new Translation3d(0.2413, -0.1905, 0.229), new Rotation3d(0,90,0));
   public static final double leftCamHeight = robotToCamLeft.getZ();
   public static final Rotation3d leftCamAngle = robotToCamLeft.getRotation();
   public static final double leftCamPitch = Math.PI/2;
 
   public static final Rotation2d robotToCamAngleLeft2D = leftCamAngle.toRotation2d();
-  public static final Transform2d robotToCamLeft2D = new Transform2d(0.33655, -0.1778, robotToCamAngleLeft2D);
+  public static final Transform2d robotToCamLeft2D = new Transform2d(robotToCamLeft.getX(), robotToCamLeft.getY(), robotToCamAngleLeft2D);
 
   
 
-  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.33655, 0.1778, 0.226), new Rotation3d(0,90,0));
+  public static final Transform3d robotToCamRight = new Transform3d(new Translation3d(0.2413, 0.1905, 0.226), new Rotation3d(0,90,0));
   public static final double rightCamHeight = robotToCamRight.getZ();
   public static final Rotation3d rightCamAngle = robotToCamRight.getRotation();
   public static final double rightCamPitch = Math.PI/2;
 
   public static final Rotation2d robotToCamAngleRight2D = leftCamAngle.toRotation2d();
-  public static final Transform2d robotToCamRight2D = new Transform2d(0.33655, 0.1778, robotToCamAngleRight2D);
+  public static final Transform2d robotToCamRight2D = new Transform2d(robotToCamRight.getX(), robotToCamRight.getY(), robotToCamAngleRight2D);
 
 
   }
@@ -75,21 +72,17 @@ public final class Constants {
     public static final double eP = 0.075;
     public static final double eI = 0;
     public static final double eD = 0;
-    //slower pid values for going down
-    public static final double edP = 0.01;
-    public static final double edI = 0;
-    public static final double edD = 0;
     //encoder values for each setpoint, assuming bottom is 0
-    //top of elevator is around encoder count = 28
+    //top of elevator is around encoder count = -144
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
     public static final double elevatorL0 = -1;
-    public static final double elevatorL1 = -10;
-    public static final double elevatorL2 = -15;
-    public static final double elevatorL3 = -20;
-    public static final double elevatorL4 = -28.5;
+    public static final double elevatorL1 = -20;
+    public static final double elevatorL2 = -40;
+    public static final double elevatorL3 = -86;
+    public static final double elevatorL4 = -140;
 
-    public static final double elevatorSpeed = .2;
-    public static final double elevatorSpeedDown = .085;
+    public static final double elevatorSpeed = .5;
+    public static final double elevatorSpeedDown = .6;
 
     public static final double coralSpeed = .2;
 
@@ -113,12 +106,16 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static final double basicDriveRatio = 0.8;
-    public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is 
-    public static final double elevatorHeightSlow = -10; //height to slow down after, in encoder counts (must be negative)
+    public static final double basicDriveRatio = 0.8; //base drive ratio (.8 of max speed)
+    public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is high enough
+    public static final double elevatorHeightSlow = -50; //height to slow down after, in encoder counts (must be negative)
+    public static final double elevatorHeightOff = -30; //height to let elevator drop after (so we dont slam down)
 
 
-
+    public static final double leftXOffset = -.5;
+    public static final double rightXOffset = .5;
+    public static final double yOffset = .5;
+    public static final double rOffset = 0;
 
     //TUNE THESE!!!
     public static final double xP = 0.125;
