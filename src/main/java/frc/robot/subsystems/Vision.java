@@ -202,7 +202,7 @@ public class Vision extends SubsystemBase {
 
                 
                 //check if target is centered, offsetleft, or offset right
-                if(yawLB > 0 && yawRB < 0){
+                if(yawLB < 0 && yawRB > 0){
                     //robot centered between both cameras
                     A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
                     D = Math.sin(radyawL) * A;

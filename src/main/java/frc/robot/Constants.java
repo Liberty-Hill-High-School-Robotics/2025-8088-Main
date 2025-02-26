@@ -80,7 +80,7 @@ public final class Constants {
     public static final double elevatorL1 = -20;
     public static final double elevatorL2 = -40;
     public static final double elevatorL3 = -86;
-    public static final double elevatorL4 = -140;
+    public static final double elevatorL4 = -143.5;
 
     public static final double elevatorSpeed = .5;
     public static final double elevatorSpeedDown = .6;
