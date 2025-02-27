@@ -202,7 +202,7 @@ public class RobotContainer {
 
      final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
-     AlignXButton.onFalse(new indexZero(m_drivesubsystem));
+     //AlignXButton.onFalse(new indexZero(m_drivesubsystem));
 
 
      final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());
