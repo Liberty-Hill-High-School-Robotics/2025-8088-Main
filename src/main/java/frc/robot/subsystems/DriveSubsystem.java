@@ -26,15 +26,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -42,8 +41,7 @@ import frc.robot.Constants.OIConstants;
 public class DriveSubsystem extends SubsystemBase {
   RobotConfig driveConfig;
   boolean rightoffset = false;
-  boolean atEnd = false;
-  double timestamp = 0;
+  int timeStep = 0;
   double index = 0;
 
 
@@ -71,7 +69,7 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
-  public CommandXboxController m_driverControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
+  public CommandPS5Controller m_driverControllerLocal = new CommandPS5Controller(OIConstants.kDriverControllerPort);
   //add a turning PID to manually control the turning of the robot, and translation pid
   PIDController TranslationPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
 
@@ -291,77 +289,69 @@ public class DriveSubsystem extends SubsystemBase {
   public void indexZero(){
     index = 0;
   }
+  
+
+  public List<Trajectory.State> TrajGenerate(){
+    //instansiate final pose
+    Pose2d FINALPOSE;
+    //create pose of the robot
+    Pose2d robotpose = m_odometry.getPoseMeters();
+
+    PathConfig.setEndVelocity(0); //should always be zero
+    PathConfig.setStartVelocity(0); //tbd (messing with values rn)
 
 
-  public void FullPIDControl(){
-    if(index == 0){
-      //create offset values (tag relative) whether or not the operator wants left/right offset
-      Pose2d FINALPOSE;
+    //set finalpose
+    if(rightoffset){
+      FINALPOSE = new Pose2d(DriveConstants.yOffset, DriveConstants.rightXOffset, 
+      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
+    else{
+      FINALPOSE = new Pose2d(DriveConstants.yOffset, DriveConstants.leftXOffset, 
+      Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
 
-      //create pose of the robot
-      Pose2d robotpose = m_odometry.getPoseMeters();
+    //TODO override
+    FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
 
-      if(rightoffset){
-        FINALPOSE = new Pose2d(DriveConstants.yOffset, DriveConstants.rightXOffset, 
-        Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
-      }
-      else{
-        FINALPOSE = new Pose2d(DriveConstants.yOffset, DriveConstants.leftXOffset, 
-        Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
-      }
+    //create and add stuff to a pose list
+    List<Pose2d> poselist = new ArrayList<>();
+    poselist.add(robotpose); //start pose
+    poselist.add(FINALPOSE); //end pose
 
-        FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
-        index++;
-        //inital stuff over
-      if(index == 1){
-        //run calculate traj. and set speeds
-        try {
-          //create list of poses (start and end) for traj. generation
-          List<Pose2d> poselist = new ArrayList<>();
-          poselist.add(robotpose);
-          poselist.add(FINALPOSE);
+    var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
+    timeStep = 0;
+
+    //get all states along the spline
+    List<Trajectory.State> SplineStates = trajectory.getStates();
+
+    //return states along the spline
+    return SplineStates;
+  }
+
+
+  public void FullPIDControl(List<Trajectory.State> splines){
+    try{
+      //set robot pose
+      Pose2d robotPose = m_odometry.getPoseMeters();
+      //get ending states
+      Trajectory.State endingState = splines.get(splines.size());
+      Rotation2d endingRotation = endingState.poseMeters.getRotation();
+
+      //get next state
+      Trajectory.State nextState = splines.get(timeStep);
+
+      //calculate output speeds at timeStep
+      ChassisSpeeds controlledSpeeds = controller.calculate(robotPose, nextState, endingRotation);
     
-          PathConfig.setEndVelocity(0); //should always be zero
-          PathConfig.setStartVelocity(0); //tbd (messing with values rn)
-          var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
-          //TODO are we going to generate a new traj. every time? maybe get init pose?
-    
-          double totalTime = trajectory.getTotalTimeSeconds();
-          timestamp = 0;
-    
-          while(timestamp < totalTime){ //check for x and y values to be commanded
-    
-            var currentState = trajectory.sample(timestamp);
-      
-            timestamp = timestamp +.2;
-      
-            //create chassisspeed class with the traj.
-            ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, currentState, FINALPOSE.getRotation());
-            //invert X (and y)
-            ChassisSpeeds adjustedspeeds = new ChassisSpeeds(
-            controlledSpeeds.vxMetersPerSecond, controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
-            //apply these speeds
-            setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
-            if(timestamp == totalTime){
-              index++;
-            }
-          }
-        System.out.println("ATPOINT");
-        } 
-        catch (Exception e) {
-          System.out.println("at position error");
-        }
-        
-      }
-      if(index ==2){
-        //done state
-        //wait till button
-        final Trigger ButtonState = m_driverControllerLocal.b().and(m_driverControllerLocal.leftBumper().negate());
-        if(!ButtonState.getAsBoolean()){
-          index = 0;
-        }
+      setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
 
-      }
+      //increase timestep for next run of path following
+      timeStep++;
+
+    }
+    catch(Exception e){
+      System.out.println("GENERAL ERROR PATH FOLLOWING; INFORM PROGRAMMER");
     }
   }
 
@@ -378,6 +368,16 @@ public class DriveSubsystem extends SubsystemBase {
       //update m_odo using gyro, encoders, and vision pose
       m_odometry.resetPose(VisionPose);
     }
+  }
+
+  public void SimpleAlign(){
+    double setpoint = .3;
+    double VisionY = SmartDashboard.getNumber("POSEFy", 0);
+    double calc = TranslationPID.calculate(VisionY, setpoint);
+
+    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(m_driverControllerLocal.getLeftX(), calc, m_driverControllerLocal.getRightX());
+
+    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
   }
 
 }

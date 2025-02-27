@@ -78,7 +78,7 @@ public final class Constants {
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
     public static final double elevatorL0 = -1;
     public static final double elevatorL1 = -20;
-    public static final double elevatorL2 = -45;
+    public static final double elevatorL2 = -43;
     public static final double elevatorL3 = -88;
     public static final double elevatorL4 = -149;
 

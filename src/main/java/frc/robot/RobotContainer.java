@@ -30,6 +30,7 @@ import frc.robot.Constants.MotorSpeeds;
 import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -46,7 +47,6 @@ import frc.robot.commands.AutoL4;
 import frc.robot.commands.Coral.IntakeOut;
 //Command importsx
 import frc.robot.commands.Drive.*;
-import frc.robot.commands.Elevator.ElevatorDown;
 import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
@@ -76,7 +76,8 @@ public class RobotContainer {
   public final SendableChooser<Command> autoChooser;
 
   //Create the driver and operator controller. Please use CommandXboxController instead of XboxController
-  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  
+  CommandPS5Controller m_driverController = new CommandPS5Controller(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
 
@@ -162,7 +163,7 @@ public class RobotContainer {
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
-        var boostRatio = m_driverController.getHID().getLeftBumperButton() ? 1 : DriveConstants.basicDriveRatio;
+        var boostRatio = m_driverController.getHID().getR1Button() ? 1 : DriveConstants.basicDriveRatio;
         //check if elevator is high, if so, mutliply robot speed by variable (should halve speed or similar)
         boolean elevatorheight = false;
         double elevatorSlowRatio = 1;
@@ -179,7 +180,7 @@ public class RobotContainer {
           -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
           -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband) * elevatorSlowRatio,
-          false); },
+          true); },
           m_drivesubsystem));
   }
 
@@ -200,35 +201,34 @@ public class RobotContainer {
      * commandname.toggleontrue(new commandname(m_subsystem(s)));
      */
 
-     final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
-     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
-     //AlignXButton.onFalse(new indexZero(m_drivesubsystem));
+     //driver joystick
+
+     final Trigger ResetHeading = m_driverController.triangle();
+     ResetHeading.onTrue(new ZeroHeading(m_drivesubsystem));
+
+     final Trigger AlignXButton = m_driverController.circle().and(m_driverController.L1().negate());
+     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem, m_drivesubsystem.TrajGenerate()));
 
 
-     final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());
-     ElevatorUp.whileTrue(new ElevatorUp(m_elevator));
 
-     final Trigger ElevatorDown = m_driverController.a().and(m_driverController.leftBumper().negate());
-     ElevatorDown.whileTrue(new ElevatorDown(m_elevator));
-
-
+     //operator joystick
      //elevator setpoints
-     final Trigger ElevatorL4 = m_driverController.leftBumper().and(m_driverController.y());
+     final Trigger ElevatorL4 = m_operatorController.y();
      ElevatorL4.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
 
-     final Trigger ElevatorL3 = m_driverController.leftBumper().and(m_driverController.b());
+     final Trigger ElevatorL3 = m_operatorController.b();
      ElevatorL3.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL3));
 
-     final Trigger ElevatorL2 = m_driverController.leftBumper().and(m_driverController.x());
+     final Trigger ElevatorL2 = m_operatorController.x();
      ElevatorL2.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
 
-     final Trigger ElevatorL1 = m_driverController.leftBumper().and(m_driverController.a());
+     final Trigger ElevatorL1 = m_operatorController.a();
      ElevatorL1.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL1));
 
-     final Trigger CoralIN = m_driverController.rightBumper();
-     CoralIN.whileTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
+     final Trigger CoralIN = m_operatorController.rightBumper();
+     CoralIN.toggleOnTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
 
-     final Trigger CoralOUT = m_driverController.back();
+     final Trigger CoralOUT = m_operatorController.leftBumper();
      CoralOUT.whileTrue(new frc.robot.commands.Coral.IntakeOut(m_coral));
      CoralOUT.onFalse(new ElevatorDownDefault(m_elevator));
 
