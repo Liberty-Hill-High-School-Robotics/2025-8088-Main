@@ -32,13 +32,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 import com.pathplanner.lib.auto.*;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 //Subsystem imports
 import frc.robot.subsystems.*;
+import frc.robot.commands.AutoL4;
+import frc.robot.commands.Coral.IntakeOut;
 //Command importsx
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
@@ -81,6 +86,13 @@ public class RobotContainer {
     //Create namedcommands for PathPlanner paths. Note which names you use, as they have to be exactly the same in PP
     //example here
     //NamedCommands.registerCommand("AutoIntake", new AutoIntakeTimeout(m_intake, m_storage, m_pivot, m_leds));
+    NamedCommands.registerCommand("ElevatorL2", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
+    NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
+    NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
+
+    NamedCommands.registerCommand("ElevatorL0", new ElevatorDownDefault(m_elevator));
+
+    NamedCommands.registerCommand("CoralOut", new IntakeOut(m_coral));
 
     //Pathplanner auto chooser
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -90,6 +102,7 @@ public class RobotContainer {
     //Put the autons on the chooser and on SmartDashboard
     //example
     //SmartDashboard.putData("AmpPlayoff", new PathPlannerAuto("AmpPlayoff"));
+    SmartDashboard.putData("easy", new PathPlannerAuto("easy"));
 
     //------------------------------------------------------------------------------------------
     //----------------------------- Start of SmartDashboard Exports-----------------------------
@@ -106,7 +119,6 @@ public class RobotContainer {
     
 
     //DriveSubsytem Exports
-    SmartDashboard.putData("TESTRUN", new TESTRUN(m_drivesubsystem));
     SmartDashboard.putNumber("inception", SmartDashboard.getNumber("SDYaw", 0));
 
 
@@ -190,6 +202,7 @@ public class RobotContainer {
 
      final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
+     AlignXButton.onFalse(new indexZero(m_drivesubsystem));
 
 
      final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());

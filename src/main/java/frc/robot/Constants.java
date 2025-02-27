@@ -74,13 +74,13 @@ public final class Constants {
     public static final double eI = 0;
     public static final double eD = 0;
     //encoder values for each setpoint, assuming bottom is 0
-    //top of elevator is around encoder count = -144
+    //top of elevator is around encoder count = -149.5
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
     public static final double elevatorL0 = -1;
     public static final double elevatorL1 = -20;
-    public static final double elevatorL2 = -51;
-    public static final double elevatorL3 = -92;
-    public static final double elevatorL4 = -143.5;
+    public static final double elevatorL2 = -47;
+    public static final double elevatorL3 = -88;
+    public static final double elevatorL4 = -149;
 
     public static final double elevatorSpeed = .5;
     public static final double elevatorSpeedDown = .6;

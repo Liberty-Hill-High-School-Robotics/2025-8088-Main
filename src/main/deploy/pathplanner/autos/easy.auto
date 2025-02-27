@@ -19,25 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ElevatorL2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CoralOut"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ElevatorL4Auto"
           }
         }
       ]
