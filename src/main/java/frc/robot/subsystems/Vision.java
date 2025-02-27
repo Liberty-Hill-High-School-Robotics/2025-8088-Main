@@ -264,15 +264,15 @@ public class Vision extends SubsystemBase {
                 //get yaw to target given pose(s)
                 Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
 
-                if(!Lresult.hasTargets() && !Rresult.hasTargets()){
-                    pose2D = new Pose2d(0, 0, m_gyro.getRotation2d());
-                }
-
                 SmartDashboard.putNumber("POSEFx", pose2D.getX());
                 SmartDashboard.putNumber("POSEFy", pose2D.getY());
                 SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
                 SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
                 }
+                }
+            if(!Lresult.hasTargets() && !Rresult.hasTargets()){
+                SmartDashboard.putNumber("POSEFx", 0);
+                SmartDashboard.putNumber("POSEFy", 0);
             }
         }
     }

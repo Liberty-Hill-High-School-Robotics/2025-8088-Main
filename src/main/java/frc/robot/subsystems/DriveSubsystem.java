@@ -4,6 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -23,20 +32,11 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import com.pathplanner.lib.auto.AutoBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.ctre.phoenix6.hardware.*;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class DriveSubsystem extends SubsystemBase {
   RobotConfig driveConfig;
@@ -131,6 +131,43 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    //final pose of the robot
+    //m_odometry.update(null, null);
+    Pose2d FINALPOSE;
+    Pose2d robotpose = new Pose2d(SmartDashboard.getNumber("POSEFx", 0), 
+    SmartDashboard.getNumber("POSEFy", 0), 
+    Rotation2d.fromDegrees(SmartDashboard.getNumber("POSEFa", 0)));
+
+    if(rightoffset){
+      //FINALPOSE = new Pose2d(DriveConstants.rightXOffset, DriveConstants.yOffset, 
+      //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
+    else{
+      //FINALPOSE = new Pose2d(DriveConstants.leftXOffset, DriveConstants.yOffset, 
+      //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
+    }
+
+    FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(SmartDashboard.getNumber("POSEFTa", 0)));
+
+    try {
+    List<Pose2d> poselist = new ArrayList<>();
+    poselist.add(m_odometry.getPoseMeters());
+    poselist.add(FINALPOSE);
+
+    PathConfig.setEndVelocity(0); //should always be zero
+    PathConfig.setStartVelocity(0); //tbd (messing with values rn)
+    var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
+    //create chassisspeed class with the traj.
+    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), FINALPOSE.getRotation());
+    //invert X (and y)
+    ChassisSpeeds adjustedspeeds = new ChassisSpeeds(
+      controlledSpeeds.vxMetersPerSecond, -controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
+    //apply these speeds
+    //if(m_odometry.getPoseMeters() != FINALPOSE){
+      setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
+    } catch (Exception e) {
+      System.out.println("at position error");
+    }
     UpdateODO();
 
     SmartDashboard.putNumber("gyrovalue", getHeading());
@@ -283,37 +320,13 @@ public class DriveSubsystem extends SubsystemBase {
     return rightoffset;
   }
 
-
-  public void leftrightPIDcontrol(double current){
-    double calc = TranslationPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
-    double calcD = TranslationPID.calculate(SmartDashboard.getNumber("SDDistance", 0), 15);
-    //double calcR = turningPID.calculate(SmartDashboard.getNumber("SDYaw", 0), 0);
-
-    var speeds = new ChassisSpeeds(calcD, calc, 0);
-    //apply these speeds
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
-  }
-
-
-  public void TESTRUN(){
-    double distance = SmartDashboard.getNumber("outputvalue", 0);
-    double rotation = SmartDashboard.getNumber("POSEYAW", 0);
-    double calc = TranslationPID.calculate(distance, 1);
-    double calcR = TranslationPID.calculate(rotation, 0);
-
-
-    var speeds = new ChassisSpeeds((-calc * DriveConstants.kMaxSpeedMetersPerSecond),
-                                   (-MathUtil.applyDeadband(m_driverControllerLocal.getLeftX(), OIConstants.kDriveDeadband) * DriveConstants.kMaxAngularSpeed),
-                                   (-calcR));
-    //apply swerve module states
-
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(speeds));
-  }
-
-
   public void FullPIDControl(){
     //create offset values (tag relative) whether or not the operator wants left/right offset
     Pose2d FINALPOSE;
+    Pose2d robotpose = new Pose2d(SmartDashboard.getNumber("POSEFx", 0), 
+    SmartDashboard.getNumber("POSEFy", 0), 
+    Rotation2d.fromDegrees(SmartDashboard.getNumber("POSEFa", 0)));
+
     if(rightoffset){
       //FINALPOSE = new Pose2d(DriveConstants.rightXOffset, DriveConstants.yOffset, 
       //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
@@ -323,9 +336,9 @@ public class DriveSubsystem extends SubsystemBase {
       //Rotation2d.fromDegrees(SmartDashboard.getNumber("poseLRT", 0) + DriveConstants.rOffset));
     }
 
-    FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(-130));
+    FINALPOSE = new Pose2d(1, 0, Rotation2d.fromDegrees(SmartDashboard.getNumber("POSEFTa", 0)));
 
-
+    try {
     List<Pose2d> poselist = new ArrayList<>();
     poselist.add(m_odometry.getPoseMeters());
     poselist.add(FINALPOSE);
@@ -334,13 +347,16 @@ public class DriveSubsystem extends SubsystemBase {
     PathConfig.setStartVelocity(0); //tbd (messing with values rn)
     var trajectory = TrajectoryGenerator.generateTrajectory(poselist, PathConfig); //generate traj.
     //create chassisspeed class with the traj.
-    ChassisSpeeds controlledSpeeds = controller.calculate(m_odometry.getPoseMeters(), trajectory.sample(trajectory.getTotalTimeSeconds()), FINALPOSE.getRotation());
+    ChassisSpeeds controlledSpeeds = controller.calculate(robotpose, trajectory.sample(trajectory.getTotalTimeSeconds()), FINALPOSE.getRotation());
     //invert X (and y)
     ChassisSpeeds adjustedspeeds = new ChassisSpeeds(
-      -controlledSpeeds.vxMetersPerSecond, controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
+      controlledSpeeds.vxMetersPerSecond, -controlledSpeeds.vyMetersPerSecond, controlledSpeeds.omegaRadiansPerSecond);
     //apply these speeds
     //if(m_odometry.getPoseMeters() != FINALPOSE){
       setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(adjustedspeeds));
+    } catch (Exception e) {
+      System.out.println("UUUUUUUsdfasfdUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU (KA)");
+    }
     //}
   }
 

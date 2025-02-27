@@ -42,6 +42,7 @@ import frc.robot.subsystems.*;
 //Command importsx
 import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDown;
+import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
 import frc.robot.commands.Vision_LEDS.SetLEDPattern;
@@ -190,12 +191,6 @@ public class RobotContainer {
      final Trigger AlignXButton = m_driverController.b().and(m_driverController.leftBumper().negate());
      AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem));
 
-     final Trigger CoralIN = m_driverController.rightBumper();
-     CoralIN.whileTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
-
-     final Trigger CoralOUT = m_driverController.back();
-     CoralOUT.whileTrue(new frc.robot.commands.Coral.IntakeOut(m_coral));
-
 
      final Trigger ElevatorUp = m_driverController.y().and(m_driverController.leftBumper().negate());
      ElevatorUp.whileTrue(new ElevatorUp(m_elevator));
@@ -206,16 +201,23 @@ public class RobotContainer {
 
      //elevator setpoints
      final Trigger ElevatorL4 = m_driverController.leftBumper().and(m_driverController.y());
-     ElevatorL4.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
+     ElevatorL4.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
 
      final Trigger ElevatorL3 = m_driverController.leftBumper().and(m_driverController.b());
-     ElevatorL3.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL3));
+     ElevatorL3.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL3));
 
      final Trigger ElevatorL2 = m_driverController.leftBumper().and(m_driverController.x());
-     ElevatorL2.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
+     ElevatorL2.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
 
      final Trigger ElevatorL1 = m_driverController.leftBumper().and(m_driverController.a());
-     ElevatorL1.whileTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL1));
+     ElevatorL1.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL1));
+
+     final Trigger CoralIN = m_driverController.rightBumper();
+     CoralIN.whileTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
+
+     final Trigger CoralOUT = m_driverController.back();
+     CoralOUT.whileTrue(new frc.robot.commands.Coral.IntakeOut(m_coral));
+     CoralOUT.onFalse(new ElevatorDownDefault(m_elevator));
 
      //left/right offsets
 

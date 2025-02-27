@@ -78,8 +78,8 @@ public final class Constants {
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
     public static final double elevatorL0 = -1;
     public static final double elevatorL1 = -20;
-    public static final double elevatorL2 = -40;
-    public static final double elevatorL3 = -86;
+    public static final double elevatorL2 = -51;
+    public static final double elevatorL3 = -92;
     public static final double elevatorL4 = -143.5;
 
     public static final double elevatorSpeed = .5;
@@ -110,7 +110,7 @@ public final class Constants {
     public static final double basicDriveRatio = 0.8; //base drive ratio (.8 of max speed)
     public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is high enough
     public static final double elevatorHeightSlow = -40; //height to slow down after, in encoder counts (must be negative)
-    public static final double elevatorHeightOff = -5; //height to let elevator drop after (so we dont slam down)
+    public static final double elevatorHeightOff = -2; //height to let elevator drop after (so we dont slam down)
 
 
     public static final double leftXOffset = -.5;
