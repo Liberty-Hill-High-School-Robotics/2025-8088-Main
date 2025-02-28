@@ -371,11 +371,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void SimpleAlign(){
-    double setpoint = .3;
-    double VisionY = SmartDashboard.getNumber("POSEFy", 0);
+    double setpoint = 0;
+    double VisionY = SmartDashboard.getNumber("RIGHTYAW", 0);
     double calc = TranslationPID.calculate(VisionY, setpoint);
 
-    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(m_driverControllerLocal.getLeftX(), calc, m_driverControllerLocal.getRightX());
+    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(-m_driverControllerLocal.getLeftY(), calc, m_driverControllerLocal.getRightX());
 
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
   }

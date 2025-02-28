@@ -152,6 +152,7 @@ public class Vision extends SubsystemBase {
                 else{
                 SmartDashboard.putString("targetsame", "YES");
                 double yawR = Rresult.getBestTarget().yaw;
+                SmartDashboard.putNumber("RIGHTYAW", yawR);
                 double yawL = Lresult.getBestTarget().yaw;
                 double yawRB = Rresult.getBestTarget().yaw;
                 double yawLB = Lresult.getBestTarget().yaw;
