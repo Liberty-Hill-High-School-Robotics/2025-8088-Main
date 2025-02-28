@@ -70,13 +70,13 @@ public final class Constants {
   }
 
   public static final class MotorSpeeds{
-    public static final double eP = 0.075;
+    public static final double eP = 0.07;
     public static final double eI = 0;
     public static final double eD = 0;
 
     //down PID constants
-    public static final double ePd = 0.040;
-    public static final double eId = 0;
+    public static final double ePd = 0.002;
+    public static final double eId = 0.003;
     public static final double eDd = 0;
     //encoder values for each setpoint, assuming bottom is 0
     //top of elevator is around encoder count = -149.5
@@ -115,7 +115,7 @@ public final class Constants {
     public static final double basicDriveRatio = 0.5; //base drive ratio (.8 of max speed)
     public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is high enough
     public static final double elevatorHeightSlow = -40; //height to slow down after, in encoder counts (must be negative)
-    public static final double elevatorHeightOff = -2; //height to let elevator drop after (so we dont slam down)
+    public static final double elevatorHeightOff = -5; //height to let elevator drop after (so we dont slam down)
 
 
     public static final double leftXOffset = -.5;
