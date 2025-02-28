@@ -107,7 +107,7 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static final double basicDriveRatio = 0.8; //base drive ratio (.8 of max speed)
+    public static final double basicDriveRatio = 0.5; //base drive ratio (.8 of max speed)
     public static final double elevatorSpeedRatio = 0.25; //ratio to slow down to if elevator is high enough
     public static final double elevatorHeightSlow = -40; //height to slow down after, in encoder counts (must be negative)
     public static final double elevatorHeightOff = -2; //height to let elevator drop after (so we dont slam down)

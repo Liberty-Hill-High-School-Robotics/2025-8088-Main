@@ -163,7 +163,7 @@ public class RobotContainer {
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
-        var boostRatio = m_driverController.getHID().getR1Button() ? 1 : DriveConstants.basicDriveRatio;
+        var boostRatio = m_driverController.getHID().getR1Button() ? .8 : DriveConstants.basicDriveRatio;
         //check if elevator is high, if so, mutliply robot speed by variable (should halve speed or similar)
         boolean elevatorheight = false;
         double elevatorSlowRatio = 1;
@@ -206,8 +206,8 @@ public class RobotContainer {
      final Trigger ResetHeading = m_driverController.triangle();
      ResetHeading.onTrue(new ZeroHeading(m_drivesubsystem));
 
-     final Trigger AlignXButton = m_driverController.circle().and(m_driverController.L1().negate());
-     AlignXButton.whileTrue(new LeftRightPID(m_drivesubsystem, m_drivesubsystem.TrajGenerate()));
+     final Trigger EasyAlign = m_driverController.circle();
+     EasyAlign.whileTrue(new easyAlign(m_drivesubsystem));
 
 
 
