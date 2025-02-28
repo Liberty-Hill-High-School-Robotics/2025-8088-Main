@@ -104,6 +104,8 @@ public class RobotContainer {
     //example
     //SmartDashboard.putData("AmpPlayoff", new PathPlannerAuto("AmpPlayoff"));
     SmartDashboard.putData("easy", new PathPlannerAuto("easy"));
+    SmartDashboard.putData("MOVEHYES", new PathPlannerAuto("MOVEHYES"));
+
 
     //------------------------------------------------------------------------------------------
     //----------------------------- Start of SmartDashboard Exports-----------------------------

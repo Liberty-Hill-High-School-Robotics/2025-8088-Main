@@ -18,6 +18,8 @@ import frc.robot.Constants.MotorSpeeds;
 public class Elevator extends SubsystemBase {
 
     PIDController ElevatorPID = new PIDController(MotorSpeeds.eP, MotorSpeeds.eI, MotorSpeeds.eD);
+    PIDController ElevatorPIDDown = new PIDController(MotorSpeeds.ePd, MotorSpeeds.eId, MotorSpeeds.eDd);
+
 
 
     //motors & variables here, define them and create any PIDs needed
@@ -88,7 +90,7 @@ public class Elevator extends SubsystemBase {
             elevatorSparkMax.stopMotor();
         }
         else{
-            double calc = ElevatorPID.calculate(elevatorRelativeEncoder.getPosition(), DriveConstants.elevatorHeightOff);
+            double calc = ElevatorPIDDown.calculate(elevatorRelativeEncoder.getPosition(), DriveConstants.elevatorHeightOff);
             elevatorSparkMax.set(calc);
         }
     }

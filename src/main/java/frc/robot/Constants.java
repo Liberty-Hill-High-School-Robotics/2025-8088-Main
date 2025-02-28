@@ -73,6 +73,11 @@ public final class Constants {
     public static final double eP = 0.075;
     public static final double eI = 0;
     public static final double eD = 0;
+
+    //down PID constants
+    public static final double ePd = 0.040;
+    public static final double eId = 0;
+    public static final double eDd = 0;
     //encoder values for each setpoint, assuming bottom is 0
     //top of elevator is around encoder count = -149.5
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
