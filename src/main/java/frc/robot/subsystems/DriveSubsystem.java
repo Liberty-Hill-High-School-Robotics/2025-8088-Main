@@ -96,6 +96,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    //m_gyro.reset();
     try{
       driveConfig = RobotConfig.fromGUISettings();
     } catch (Exception e) {
