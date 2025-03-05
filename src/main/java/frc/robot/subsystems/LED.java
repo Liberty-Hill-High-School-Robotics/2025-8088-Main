@@ -3,13 +3,16 @@ package frc.robot.subsystems;
 //all imports here
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.CanIDs;
 
 
 
 public class LED extends SubsystemBase {
+    private double localLedValue = RobotContainer.LedState;
     public double value = -1;
     public enum BlinkinPattern {
         /*
@@ -169,6 +172,10 @@ public class LED extends SubsystemBase {
     */
     public void setPattern(double pattern) {
         m_blinkin.set(pattern);
+    }
+    
+    public void DefaultSetPattern(){
+        m_blinkin.set(localLedValue);
     }
 
 }

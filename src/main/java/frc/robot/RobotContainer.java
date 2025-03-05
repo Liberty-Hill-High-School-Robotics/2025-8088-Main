@@ -50,7 +50,6 @@ import frc.robot.commands.Drive.*;
 import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
-import frc.robot.commands.Vision_LEDS.SetLEDPattern;
 
 
 
@@ -69,11 +68,12 @@ public class RobotContainer {
   public final Algae m_algae = new Algae();
   public final LED m_led = new LED();
   public final Vision m_vision = new Vision();
-  private final DriveSubsystem m_drivesubsystem = new DriveSubsystem();
+  public final DriveSubsystem m_drivesubsystem = new DriveSubsystem();
 
 
   //create an autonomous chooser
   public final SendableChooser<Command> autoChooser;
+  public static double LedState;
 
   //Create the driver and operator controller. Please use CommandXboxController instead of XboxController
   
@@ -136,7 +136,6 @@ public class RobotContainer {
 
 
     //LEDs Exports
-    SmartDashboard.putData("SETLED", new SetLEDPattern(m_led, .7));
 
     //------------------------------------- Other Exports ------------------------------------
     //SemiAuto Commands
@@ -161,7 +160,13 @@ public class RobotContainer {
 
    // m_elevator.setDefaultCommand(new ElevatorDownDefault(m_elevator));
     m_elevator.setDefaultCommand(
-    new RunCommand(() -> {m_elevator.elevatorStopDefault();}, m_elevator));
+    new RunCommand(() -> {m_elevator.elevatorStopDefault();
+    }, m_elevator));
+
+    m_led.setDefaultCommand(
+    new RunCommand(() -> {m_led.DefaultSetPattern();
+    }, m_led));
+
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {

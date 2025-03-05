@@ -10,11 +10,9 @@ import frc.robot.subsystems.LED;
 public class SetLEDPattern extends Command {
   // The subsystem the command runs on
   private final LED m_led;
-  double local;
 
-  public SetLEDPattern(LED subsystem, double current) {
+  public SetLEDPattern(LED subsystem) {
     m_led = subsystem;
-    local = current;
     addRequirements(m_led);
   }
 
@@ -25,7 +23,7 @@ public class SetLEDPattern extends Command {
 
   @Override
   public void execute(){
-    m_led.setPattern(local);
+    m_led.DefaultSetPattern();
   }
 
   @Override

@@ -15,6 +15,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
@@ -31,6 +32,7 @@ public class Vision extends SubsystemBase {
     PhotonCamera RightCamera = new PhotonCamera("USB CAM R (High)");
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
+    //init objects and such
     public final double xLeftOffset = visionData.robotToCamLeft.getY();
     public final double xRightOffset = visionData.robotToCamRight.getY();
 
@@ -40,8 +42,6 @@ public class Vision extends SubsystemBase {
     double output;
     double outputy;
     double calcYaw = 0;
-
-
 
 
     // The field from AprilTagFields will be different depending on the game.
@@ -83,8 +83,8 @@ public class Vision extends SubsystemBase {
                 //get all usable data from target:
                 //yaw, pitch, area, ID, pose, height
                 PhotonTrackedTarget Lbesttarget = Lresult.getBestTarget();
-               // double Lyaw = Lbesttarget.getYaw();
-               // double Lpitch = Lbesttarget.getPitch();
+                // double Lyaw = Lbesttarget.getYaw();
+                // double Lpitch = Lbesttarget.getPitch();
                 //double Larea = Lbesttarget.getArea();
                 int LtargetID = Lbesttarget.getFiducialId();
                 Optional<Pose3d> Ltargetpose = aprilTagFieldLayout.getTagPose(LtargetID);
@@ -148,7 +148,6 @@ public class Vision extends SubsystemBase {
                 if(RID != LID){
                     SmartDashboard.putString("targetsame", "NO");
                 }
-                //if targets are same //TODO
                 else{
                 SmartDashboard.putString("targetsame", "YES");
                 double yawR = Rresult.getBestTarget().yaw;
@@ -260,8 +259,10 @@ public class Vision extends SubsystemBase {
                 //calculate robot pose from the camera to target translation, given localpose, target pose, and gyro angle
                 //var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
                 Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
+
+                Transform3d robotToTag = new Transform3d(output, outputy, visionData.gyroHeightMeters, m_gyro.getRotation3d());
                 //calculate true zero of robot given pose and offsets from camera? TODO
-                //
+
                 //get yaw to target given pose(s)
                 Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
 
@@ -269,6 +270,10 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("POSEFy", pose2D.getY());
                 SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
                 SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
+                Pose3d fieldpose = PhotonUtils.estimateFieldToRobotAprilTag(robotToTag, Rtargetpose.get(), visionData.robotToCamLeft);
+                SmartDashboard.putNumber("robotFieldX", fieldpose.getX());
+                SmartDashboard.putNumber("robotFieldX", fieldpose.getY());
+                SmartDashboard.putNumber("robotFieldX", fieldpose.getZ());
                 }
                 }
             if(!Lresult.hasTargets() && !Rresult.hasTargets()){
