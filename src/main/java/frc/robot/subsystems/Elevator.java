@@ -26,6 +26,7 @@ public class Elevator extends SubsystemBase {
     private SparkMax elevatorSparkMax;
     private RelativeEncoder elevatorRelativeEncoder;
     private SparkLimitSwitch elevatorBottomLimit;
+    private SparkLimitSwitch elevatorTopLimit;
     //private SparkLimitSwitch elevatorTopLimit;
 
     public Elevator(){
@@ -33,7 +34,7 @@ public class Elevator extends SubsystemBase {
         //config motor settings here
         elevatorSparkMax = new SparkMax(CanIDs.elevatorMotorID, MotorType.kBrushless);
         elevatorBottomLimit = elevatorSparkMax.getForwardLimitSwitch();
-        //elevatorTopLimit = elevatorSparkMax.getForwardLimitSwitch();
+        elevatorTopLimit = elevatorSparkMax.getReverseLimitSwitch();
         
         //elevatorRelativeEncoder.
         elevatorRelativeEncoder = elevatorSparkMax.getEncoder();
@@ -46,6 +47,7 @@ public class Elevator extends SubsystemBase {
         //This method will be called once per scheduler run
         //Put smartdashboard stuff, check for limit switches
         SmartDashboard.putBoolean("elevatorbottom", elevatorAtBottomLimit());
+        SmartDashboard.putBoolean("elevatorTop", elevatorAtTopLimit());
         SmartDashboard.putNumber("elevatorencoder", elevatorEncoderGet());
         if(elevatorBottomLimit.isPressed()){
             elevatorRelativeEncoder.setPosition(0);
@@ -68,6 +70,7 @@ public class Elevator extends SubsystemBase {
 
     public void elevatorUp(){
         elevatorSparkMax.set(-MotorSpeeds.elevatorSpeed);
+        elevatorEncoderGet();
 
     }
 
@@ -101,8 +104,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean elevatorAtTopLimit(){
-        //return elevatorTopLimit.isPressed();
-        return false; 
+        return elevatorTopLimit.isPressed();
     }
 
     public double elevatorEncoderGet(){
