@@ -2,24 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/*
-unused imports
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import java.util.List;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-//import com.pathplanner.lib.commands.PathPlannerAuto;
-*/
-
 package frc.robot;
 
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
@@ -77,7 +59,7 @@ public class RobotContainer {
 
   //Create the driver and operator controller. Please use CommandXboxController instead of XboxController
   
-  CommandPS5Controller m_driverController = new CommandPS5Controller(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
 
@@ -170,7 +152,7 @@ public class RobotContainer {
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
-        var boostRatio = m_driverController.getHID().getR1Button() ? .8 : DriveConstants.basicDriveRatio;
+        var boostRatio = m_driverController.getHID().getRightBumperButton() ? .8 : DriveConstants.basicDriveRatio;
         //check if elevator is high, if so, mutliply robot speed by variable (should halve speed or similar)
         boolean elevatorheight = false;
         double elevatorSlowRatio = 1;
@@ -210,10 +192,10 @@ public class RobotContainer {
 
      //driver joystick
 
-     final Trigger ResetHeading = m_driverController.triangle();
+     final Trigger ResetHeading = m_driverController.y();
      ResetHeading.onTrue(new ZeroHeading(m_drivesubsystem));
 
-     final Trigger EasyAlign = m_driverController.circle();
+     final Trigger EasyAlign = m_driverController.b();
      EasyAlign.whileTrue(new easyAlign(m_drivesubsystem));
 
 

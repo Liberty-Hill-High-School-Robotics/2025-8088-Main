@@ -129,9 +129,9 @@ public final class Constants {
     public static final double xP = 0.125;
     public static final double xI = 0;
     public static final double xD = 0;
-    public static final double yP = 0.05;
-    public static final double yI = 0;
-    public static final double yD = 0;
+    public static final double aP = 0.05;
+    public static final double aI = 0;
+    public static final double aD = 0;
 
 
     // Driving Parameters - Note that these are not the maximum capable speeds of

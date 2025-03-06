@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +74,8 @@ public class DriveSubsystem extends SubsystemBase {
   public CommandPS5Controller m_driverControllerLocal = new CommandPS5Controller(OIConstants.kDriverControllerPort);
   //add a turning PID to manually control the turning of the robot, and translation pid
   PIDController TranslationPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
+  PIDController RotationPID = new PIDController(DriveConstants.aP, DriveConstants.aI, DriveConstants.aD);
+
 
   TrajectoryConfig PathConfig = new TrajectoryConfig(DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxAngularSpeed);
   
@@ -371,13 +375,43 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+
+  //get proper yaw values to tag, tune translation pids, and make sure it works without close ups
+
+  
+  //PID controls for x and y values of the cameras!
   public void SimpleAlign(){
-    double setpoint = 0;
-    double VisionY = SmartDashboard.getNumber("RIGHTYAW", 0);
-    double calc = TranslationPID.calculate(VisionY, setpoint);
+    //get tag angle
+    double Langle = SmartDashboard.getNumber("poseLRT", m_gyro.getYaw().getValueAsDouble());
+    double Rangle = SmartDashboard.getNumber("poseRRT", m_gyro.getYaw().getValueAsDouble());
+    double asetpoint = m_gyro.getYaw().getValueAsDouble(); //init as default value, is changed later
 
-    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(-m_driverControllerLocal.getLeftY(), calc, m_driverControllerLocal.getRightX());
+    //create setpoints for x and y TODO: send to constants.java
+    double xsetpoint = 0;
+    double ysetpoint = 0;
+    //check if L and R targets are the same, if so get target pose in degrees
+    if(Langle == Rangle){
+      asetpoint = Langle;
+    }
+    //get x and y from smartdashboard (and rotation of target)
+    //TODO either update drivetrain pose to get close tag tracking or make dummy default values?
+    //TODO maybe add a timeout ^
 
+    asetpoint = Langle;
+    double VisionY = SmartDashboard.getNumber("POSEFy", 0);
+    double VisionX = SmartDashboard.getNumber("POSEFx", 0);
+    double VisionA = m_gyro.getYaw().getValueAsDouble();
+    
+
+    //calculate PID values for both!
+    double calcY = TranslationPID.calculate(VisionY, ysetpoint);
+    double calcX = TranslationPID.calculate(VisionX, xsetpoint);
+    double calcA = RotationPID.calculate(VisionA, asetpoint);
+    
+
+    //create a chassisspeed class given these values
+    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(calcX, calcY, calcA);
+    //command drivetrain with x, y and omega
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
   }
 

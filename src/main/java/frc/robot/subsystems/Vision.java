@@ -260,7 +260,7 @@ public class Vision extends SubsystemBase {
                 //var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
                 Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
 
-                Transform3d robotToTag = new Transform3d(output, outputy, visionData.gyroHeightMeters, m_gyro.getRotation3d());
+                //Transform3d robotToTag = new Transform3d(output, outputy, visionData.gyroHeightMeters, m_gyro.getRotation3d());
                 //calculate true zero of robot given pose and offsets from camera? TODO
 
                 //get yaw to target given pose(s)
@@ -270,10 +270,10 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("POSEFy", pose2D.getY());
                 SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
                 SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
-                Pose3d fieldpose = PhotonUtils.estimateFieldToRobotAprilTag(robotToTag, Rtargetpose.get(), visionData.robotToCamLeft);
-                SmartDashboard.putNumber("robotFieldX", fieldpose.getX());
-                SmartDashboard.putNumber("robotFieldX", fieldpose.getY());
-                SmartDashboard.putNumber("robotFieldX", fieldpose.getZ());
+                //Pose3d fieldpose = PhotonUtils.estimateFieldToRobotAprilTag(robotToTag, Rtargetpose.get(), visionData.robotToCamLeft);
+               // SmartDashboard.putNumber("robotFieldX", fieldpose.getX());
+                //SmartDashboard.putNumber("robotFieldX", fieldpose.getY());
+                //SmartDashboard.putNumber("robotFieldX", fieldpose.getZ());
                 }
                 }
             if(!Lresult.hasTargets() && !Rresult.hasTargets()){
