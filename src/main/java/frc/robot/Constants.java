@@ -126,11 +126,13 @@ public final class Constants {
     public static final double rOffset = 0;
 
     //TUNE THESE!!!
-    public static final double xP = 0.75;
+    //forward
+    public static final double xP = .765;
     public static final double xI = 0;
     public static final double xD = 0;
-    public static final double yP = 0.75;
-    public static final double yI = 0.05;
+    //sideways
+    public static final double yP = 3;
+    public static final double yI = 0.1;
     public static final double yD = 0;
     public static final double aP = 0.05;
     public static final double aI = 0;
