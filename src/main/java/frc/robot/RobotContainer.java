@@ -59,7 +59,7 @@ public class RobotContainer {
 
   //Create the driver and operator controller. Please use CommandXboxController instead of XboxController
   
-  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandPS5Controller m_driverController = new CommandPS5Controller(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
 
@@ -87,6 +87,8 @@ public class RobotContainer {
     //SmartDashboard.putData("AmpPlayoff", new PathPlannerAuto("AmpPlayoff"));
     SmartDashboard.putData("easy", new PathPlannerAuto("easy"));
     SmartDashboard.putData("MOVEHYES", new PathPlannerAuto("MOVEHYES"));
+    SmartDashboard.putData("brand", new PathPlannerAuto("brand"));
+
 
 
     //------------------------------------------------------------------------------------------
@@ -152,7 +154,7 @@ public class RobotContainer {
 
     m_drivesubsystem.setDefaultCommand(
     new RunCommand(() -> {
-        var boostRatio = m_driverController.getHID().getRightBumperButton() ? .8 : DriveConstants.basicDriveRatio;
+        var boostRatio = m_driverController.getHID().getR1Button() ? .8 : DriveConstants.basicDriveRatio;
         //check if elevator is high, if so, mutliply robot speed by variable (should halve speed or similar)
         boolean elevatorheight = false;
         double elevatorSlowRatio = 1;
@@ -192,10 +194,10 @@ public class RobotContainer {
 
      //driver joystick
 
-     final Trigger ResetHeading = m_driverController.y();
+     final Trigger ResetHeading = m_driverController.triangle();
      ResetHeading.onTrue(new ZeroHeading(m_drivesubsystem));
 
-     final Trigger EasyAlign = m_driverController.b();
+     final Trigger EasyAlign = m_driverController.circle();
      EasyAlign.whileTrue(new easyAlign(m_drivesubsystem));
 
 

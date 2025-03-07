@@ -120,15 +120,20 @@ public final class Constants {
     public static final double elevatorHeightOff = -5; //height to let elevator drop after (so we dont slam down)
 
 
-    public static final double leftXOffset = -.5;
-    public static final double rightXOffset = .5;
+    public static final double leftXOffset = .069;
+    public static final double rightXOffset = -.18; //value good dont change unless really needed
     public static final double yOffset = .5;
     public static final double rOffset = 0;
 
     //TUNE THESE!!!
-    public static final double xP = 0.125;
+    //forward
+    public static final double xP = .765;
     public static final double xI = 0;
     public static final double xD = 0;
+    //sideways
+    public static final double yP = 3;
+    public static final double yI = 0.1;
+    public static final double yD = 0;
     public static final double aP = 0.05;
     public static final double aI = 0;
     public static final double aD = 0;

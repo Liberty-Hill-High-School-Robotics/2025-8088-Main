@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +31,11 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -72,8 +72,11 @@ public class DriveSubsystem extends SubsystemBase {
   public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
 
   public CommandPS5Controller m_driverControllerLocal = new CommandPS5Controller(OIConstants.kDriverControllerPort);
+  public CommandXboxController m_operatorControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
+
   //add a turning PID to manually control the turning of the robot, and translation pid
-  PIDController TranslationPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
+  PIDController TranslationPID = new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD);
+  PIDController SidewaysPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
   PIDController RotationPID = new PIDController(DriveConstants.aP, DriveConstants.aI, DriveConstants.aD);
 
 
@@ -381,13 +384,18 @@ public class DriveSubsystem extends SubsystemBase {
   
   //PID controls for x and y values of the cameras!
   public void SimpleAlign(){
+    //easy right align it works, 
+    //TODO make this not run way to the right if tag not seen 
+    m_driverControllerLocal.setRumble(RumbleType.kBothRumble, 1);
+
     //get tag angle
     double Langle = SmartDashboard.getNumber("poseLRT", m_gyro.getYaw().getValueAsDouble());
     double Rangle = SmartDashboard.getNumber("poseRRT", m_gyro.getYaw().getValueAsDouble());
     double asetpoint = m_gyro.getYaw().getValueAsDouble(); //init as default value, is changed later
 
     //create setpoints for x and y TODO: send to constants.java
-    double xsetpoint = 0;
+    double xLsetpoint = DriveConstants.leftXOffset;
+    double xRsetpoint = DriveConstants.rightXOffset;
     double ysetpoint = 0;
     //check if L and R targets are the same, if so get target pose in degrees
     if(Langle == Rangle){
@@ -398,14 +406,14 @@ public class DriveSubsystem extends SubsystemBase {
     //TODO maybe add a timeout ^
 
     asetpoint = Langle;
-    double VisionY = SmartDashboard.getNumber("POSEFy", 0);
+    double VisionY = SmartDashboard.getNumber("POSEFy", xRsetpoint);
     double VisionX = SmartDashboard.getNumber("POSEFx", 0);
     double VisionA = m_gyro.getYaw().getValueAsDouble();
     
 
     //calculate PID values for both!
-    double calcY = TranslationPID.calculate(VisionY, ysetpoint);
-    double calcX = TranslationPID.calculate(VisionX, xsetpoint);
+    double calcY = TranslationPID.calculate(VisionY, xRsetpoint);
+    double calcX = SidewaysPID.calculate(VisionX, ysetpoint);
     double calcA = RotationPID.calculate(VisionA, asetpoint);
     
 
@@ -413,6 +421,7 @@ public class DriveSubsystem extends SubsystemBase {
     ChassisSpeeds controlledSpeeds = new ChassisSpeeds(calcX, calcY, calcA);
     //command drivetrain with x, y and omega
     setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
+
   }
 
 }
