@@ -75,8 +75,14 @@ public class DriveSubsystem extends SubsystemBase {
   public CommandXboxController m_operatorControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
 
   //add a turning PID to manually control the turning of the robot, and translation pid
+<<<<<<< HEAD
   PIDController TranslationPID = new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD);
   PIDController SidewaysPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
+=======
+  PIDController TranslationPID = new PIDController(DriveConstants.xP, DriveConstants.xI, DriveConstants.xD);
+  PIDController SidewaysPID = new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD);
+
+>>>>>>> 6fbca15712006e30c0c59238acbe56ca9004b5fe
   PIDController RotationPID = new PIDController(DriveConstants.aP, DriveConstants.aI, DriveConstants.aD);
 
 
