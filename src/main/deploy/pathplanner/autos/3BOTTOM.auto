@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TOPSTART1"
+            "pathName": "BOTTOMSTART1"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TOPCYCLE2"
+                  "pathName": "BOTTOMCYCLE2"
                 }
               },
               {
@@ -48,7 +48,57 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TOPCYCLE3"
+                  "pathName": "BOTTOMCYCLE3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorL4Auto"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BOTTOMCYCLE4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BOTTOMCYCLE5"
                 }
               },
               {
@@ -70,6 +120,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "2",
+  "folder": "3",
   "choreoAuto": false
 }

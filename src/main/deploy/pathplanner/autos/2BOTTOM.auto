@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BOTTOMSTART"
+            "pathName": "BOTTOMSTART1"
           }
         },
         {
@@ -17,9 +17,15 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BOTTOMCYCLE2"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -27,30 +33,31 @@
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "BOTTOMCYCLE"
+                  "name": "CoralIn"
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "CoralIn"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BOTTOMCYCLE2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BOTTOMCYCLE3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIn"
+                }
+              }
+            ]
           }
         },
         {
@@ -63,6 +70,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "2",
   "choreoAuto": false
 }

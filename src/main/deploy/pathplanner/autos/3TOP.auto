@@ -65,11 +65,61 @@
           "data": {
             "name": "ElevatorL4Auto"
           }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TOPCYCLE4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TOPCYCLE5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorL4Auto"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "2",
+  "folder": "3",
   "choreoAuto": false
 }

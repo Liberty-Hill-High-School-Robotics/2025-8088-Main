@@ -5,9 +5,15 @@
   "pathFolders": [
     "1",
     "2",
-    "3"
+    "3",
+    "4",
+    "5"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "2",
+    "3",
+    "1"
+  ],
   "defaultMaxVel": 4.5,
   "defaultMaxAccel": 2.25,
   "defaultMaxAngVel": 540.0,
