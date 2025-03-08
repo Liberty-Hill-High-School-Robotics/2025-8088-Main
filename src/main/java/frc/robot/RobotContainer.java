@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.*;
 import frc.robot.commands.Align;
 import frc.robot.commands.AutoL4;
+import frc.robot.commands.Coral.IntakeIn;
 import frc.robot.commands.Coral.IntakeOut;
 //Command importsx
 import frc.robot.commands.Drive.*;
@@ -73,6 +74,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL2", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
     NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
     NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
+    NamedCommands.registerCommand("ElevatorDown", new ElevatorDownDefault(m_elevator));
+
+    NamedCommands.registerCommand("CoralIn", new IntakeIn(m_coral));
+
     SmartDashboard.putData("p", new Align(m_drivesubsystem));
 
 

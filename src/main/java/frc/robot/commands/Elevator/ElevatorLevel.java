@@ -35,6 +35,11 @@ public class ElevatorLevel extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    if(m_elevator.elevatorAtPos(local)){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 }

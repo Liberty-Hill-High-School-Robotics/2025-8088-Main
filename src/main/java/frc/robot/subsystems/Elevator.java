@@ -111,4 +111,14 @@ public class Elevator extends SubsystemBase {
     public double elevatorEncoderGet(){
         return elevatorRelativeEncoder.getPosition();
     }
+
+    public boolean elevatorAtPos(double setpoint){
+
+        if(elevatorRelativeEncoder.getPosition() < (setpoint + 1) && elevatorRelativeEncoder.getPosition() > (setpoint - 1)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
