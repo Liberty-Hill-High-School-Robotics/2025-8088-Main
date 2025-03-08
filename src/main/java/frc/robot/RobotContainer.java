@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 //Subsystem imports
 import frc.robot.subsystems.*;
+import frc.robot.commands.Align;
 import frc.robot.commands.AutoL4;
 import frc.robot.commands.Coral.IntakeOut;
 //Command importsx
@@ -72,6 +73,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL2", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2));
     NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
     NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
+    SmartDashboard.putData("p", new Align(m_drivesubsystem));
+
 
     NamedCommands.registerCommand("ElevatorL0", new ElevatorDownDefault(m_elevator));
 
@@ -197,8 +200,11 @@ public class RobotContainer {
      final Trigger ResetHeading = m_driverController.triangle();
      ResetHeading.onTrue(new ZeroHeading(m_drivesubsystem));
 
-     final Trigger EasyAlign = m_driverController.circle();
-     EasyAlign.whileTrue(new easyAlign(m_drivesubsystem));
+     final Trigger EasyAlignR = m_driverController.circle();
+     EasyAlignR.whileTrue(new easyAlign(m_drivesubsystem, true));
+
+     final Trigger EasyAlignL = m_driverController.square();
+     EasyAlignL.whileTrue(new easyAlign(m_drivesubsystem, false));
 
 
 

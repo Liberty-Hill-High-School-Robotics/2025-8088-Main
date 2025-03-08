@@ -31,7 +31,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -104,7 +103,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    //m_gyro.reset();
     try{
       driveConfig = RobotConfig.fromGUISettings();
     } catch (Exception e) {
@@ -120,6 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
         this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        //this::setChassisSpeeds,
         (speeds, feedforwards) -> setChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
@@ -143,7 +142,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    UpdateODO();
 
     SmartDashboard.putNumber("gyrovalue", getHeading());
     SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());
@@ -384,10 +382,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   //PID controls for x and y values of the cameras!
-  public void SimpleAlign(){
+  public void SimpleAlign(boolean Right){
     //easy right align it works, 
+    System.out.println("ALIGNING");
     //TODO make this not run way to the right if tag not seen 
-    m_driverControllerLocal.setRumble(RumbleType.kBothRumble, 1);
 
     //get tag angle
     double Langle = SmartDashboard.getNumber("poseLRT", m_gyro.getYaw().getValueAsDouble());
@@ -398,22 +396,25 @@ public class DriveSubsystem extends SubsystemBase {
     double xLsetpoint = DriveConstants.leftXOffset;
     double xRsetpoint = DriveConstants.rightXOffset;
     double ysetpoint = 0;
-    //check if L and R targets are the same, if so get target pose in degrees
-    if(Langle == Rangle){
-      asetpoint = Langle;
-    }
+
     //get x and y from smartdashboard (and rotation of target)
     //TODO either update drivetrain pose to get close tag tracking or make dummy default values?
     //TODO maybe add a timeout ^
 
-    asetpoint = Langle;
+    asetpoint = Rangle;
+    if(Right){
+      asetpoint = Langle;
+    }
     double VisionY = SmartDashboard.getNumber("POSEFy", xRsetpoint);
     double VisionX = SmartDashboard.getNumber("POSEFx", 0);
     double VisionA = m_gyro.getYaw().getValueAsDouble();
     
 
     //calculate PID values for both!
-    double calcY = TranslationPID.calculate(VisionY, xRsetpoint);
+    double calcY = TranslationPID.calculate(VisionY, xLsetpoint);
+    if(Right){
+      calcY = TranslationPID.calculate(VisionY, xRsetpoint);
+    }
     double calcX = SidewaysPID.calculate(VisionX, ysetpoint);
     double calcA = RotationPID.calculate(VisionA, asetpoint);
     

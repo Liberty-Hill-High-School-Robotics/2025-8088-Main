@@ -10,10 +10,11 @@ import frc.robot.subsystems.DriveSubsystem;
 public class easyAlign extends Command {
   // The subsystem the command runs on
   private final DriveSubsystem m_DriveSubsystem;
-  double localvalue;
+  boolean localvalue;
 
-  public easyAlign(DriveSubsystem subsystem) {
+  public easyAlign(DriveSubsystem subsystem, boolean Right) {
     m_DriveSubsystem = subsystem;
+    localvalue = Right;
     addRequirements(m_DriveSubsystem);
   }
 
@@ -24,7 +25,7 @@ public class easyAlign extends Command {
 
   @Override
   public void execute(){
-    m_DriveSubsystem.SimpleAlign();
+    m_DriveSubsystem.SimpleAlign(localvalue);
   }
 
   @Override

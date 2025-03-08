@@ -24,7 +24,7 @@ public class AutoL4 extends SequentialCommandGroup {
     ){
     
         addCommands(
-            new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4).withTimeout(2),
+            new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2).withTimeout(2),
             new IntakeOut(m_coral),
             new WaitCommand(.5),
             new ElevatorDownDefault(m_elevator));

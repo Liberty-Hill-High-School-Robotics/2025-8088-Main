@@ -82,6 +82,7 @@ public class Elevator extends SubsystemBase {
     public void elevatorL(double setpoint){
         double calc = ElevatorPID.calculate(elevatorRelativeEncoder.getPosition(), setpoint);
         elevatorSparkMax.set(calc);
+        System.out.println("elevatoring");
     }
 
     public void elevatorStop(){

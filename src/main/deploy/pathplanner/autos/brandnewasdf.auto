@@ -9,6 +9,24 @@
           "data": {
             "pathName": "EASY COMMANDED"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "p"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorL4Auto"
+          }
         }
       ]
     }
