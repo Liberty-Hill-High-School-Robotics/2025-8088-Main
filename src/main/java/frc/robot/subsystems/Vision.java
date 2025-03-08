@@ -15,6 +15,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
@@ -257,10 +258,9 @@ public class Vision extends SubsystemBase {
                 //var localpose = PhotonUtils.estimateCameraToTargetTranslation(output, yawRobot);
                 //calculate robot pose from the camera to target translation, given localpose, target pose, and gyro angle
                 //var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
-                Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
 
-                //Transform3d robotToTag = new Transform3d(output, outputy, visionData.gyroHeightMeters, m_gyro.getRotation3d());
-                //calculate true zero of robot given pose and offsets from camera? TODO
+                // pose
+                Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
 
                 //get yaw to target given pose(s)
                 Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
@@ -273,6 +273,21 @@ public class Vision extends SubsystemBase {
                // SmartDashboard.putNumber("robotFieldX", fieldpose.getX());
                 //SmartDashboard.putNumber("robotFieldX", fieldpose.getY());
                 //SmartDashboard.putNumber("robotFieldX", fieldpose.getZ());
+
+
+                //get robot to tag
+                Transform2d robotToTag = new Transform2d(output, outputy, m_gyro.getRotation2d());
+
+                //create robot to cam
+                Transform2d camCenterToGyro = new Transform2d(0.2413, 0.0, m_gyro.getRotation2d());
+
+                //need transform2 camera to target, 
+                Pose2d robotFieldPose = PhotonUtils.estimateFieldToRobot(robotToTag, Rtargetpose.get().toPose2d(), camCenterToGyro);
+                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getX());
+                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getY());
+                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getRotation().getDegrees());
+
+
                 }
                 }
             if(!Lresult.hasTargets() && !Rresult.hasTargets()){
