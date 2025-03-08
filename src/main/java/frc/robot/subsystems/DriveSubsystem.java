@@ -31,6 +31,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -72,6 +73,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   public CommandPS5Controller m_driverControllerLocal = new CommandPS5Controller(OIConstants.kDriverControllerPort);
   public CommandXboxController m_operatorControllerLocal = new CommandXboxController(OIConstants.kDriverControllerPort);
+
+  private final Field2d m_field = new Field2d();
+
 
   //add a turning PID to manually control the turning of the robot, and translation pid
   PIDController TranslationPID = new PIDController(DriveConstants.yP, DriveConstants.yI, DriveConstants.yD);
@@ -121,7 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
         //this::setChassisSpeeds,
         (speeds, feedforwards) -> setChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+              new PIDConstants(4.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
         ),
         driveConfig, // The robot configuration
@@ -142,6 +146,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double VISIONPOSEx = SmartDashboard.getNumber("XPOSEF", m_odometry.getPoseMeters().getX());
+    double VISIONPOSEy = SmartDashboard.getNumber("YPOSEF", m_odometry.getPoseMeters().getY());
+    Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
+    m_odometry.resetPose(visionpose);
+    SmartDashboard.putData("FieldDRIVE", m_field);
+    m_field.setRobotPose(m_odometry.getPoseMeters());
+
 
     SmartDashboard.putNumber("gyrovalue", getHeading());
     SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());

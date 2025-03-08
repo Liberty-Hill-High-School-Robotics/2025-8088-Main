@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorSpeeds;
 import frc.robot.commands.Coral.IntakeOut;
-import frc.robot.commands.Elevator.ElevatorLevel;
+import frc.robot.commands.Elevator.ElevatorLevelEnd;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.Elevator;
 
@@ -22,7 +22,7 @@ public class AutoL4 extends SequentialCommandGroup {
     ){
     
         addCommands(
-            new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL2),
+            new ElevatorLevelEnd(m_elevator, MotorSpeeds.elevatorL2),
             new IntakeOut(m_coral)
             //new ElevatorDownDefault(m_elevator) //TODO: CHECK IF THIS GOES DOWN WHEN THE COMMAND IS NOT RUN!
             );

@@ -7,12 +7,12 @@ import frc.robot.subsystems.Elevator;
  * pedagogical purposes. Actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.InstantCommand}.
  */
-public class ElevatorLevel extends Command {
+public class ElevatorLevelEnd extends Command {
   // The subsystem the command runs on
   private final Elevator m_elevator;
   double local;
 
-  public ElevatorLevel(Elevator subsystem, double setpoint) {
+  public ElevatorLevelEnd(Elevator subsystem, double setpoint) {
     m_elevator = subsystem;
     local = setpoint;
     addRequirements(m_elevator);
@@ -35,6 +35,11 @@ public class ElevatorLevel extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    if(m_elevator.elevatorAtPos(local)){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 }

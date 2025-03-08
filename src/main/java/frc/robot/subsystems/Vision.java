@@ -2,10 +2,12 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -16,6 +18,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanIDs;
@@ -42,13 +46,15 @@ public class Vision extends SubsystemBase {
     double output;
     double outputy;
     double calcYaw = 0;
+    private final Field2d m_field = new Field2d();
+
 
 
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     public Vision(){
-
+    
     }
 
 
@@ -252,6 +258,8 @@ public class Vision extends SubsystemBase {
                 //Rotation2d yawRobot = Rotation2d.fromDegrees(calcYaw);
                 //get target pose
                 Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(Rresult.getBestTarget().fiducialId);
+                
+
 
                 //TODO calculate proper Y values for two cameras, do not use library stuff
                 //calculate camera to target translation using robot yaw and distance to target (x axis only)
@@ -280,12 +288,42 @@ public class Vision extends SubsystemBase {
 
                 //create robot to cam
                 Transform2d camCenterToGyro = new Transform2d(0.2413, 0.0, m_gyro.getRotation2d());
+                //camCenterToGyro = visionData.robotToCamLeft2D;
 
                 //need transform2 camera to target, 
                 Pose2d robotFieldPose = PhotonUtils.estimateFieldToRobot(robotToTag, Rtargetpose.get().toPose2d(), camCenterToGyro);
                 SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getX());
-                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getY());
-                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getRotation().getDegrees());
+                SmartDashboard.putNumber("fieldPOSEY", robotFieldPose.getY());
+                SmartDashboard.putNumber("fieldPOSEA", robotFieldPose.getRotation().getDegrees());
+
+
+                //m_field.setRobotPose(robotFieldPose);
+                SmartDashboard.putData("Field", m_field);
+
+                if (Lresult.getMultiTagResult().isPresent()){
+                    Transform3d fieldToCamera = Lresult.getMultiTagResult().get().estimatedPose.best;
+                    System.out.println("multitag presentL");
+                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), fieldToCamera.getRotation().toRotation2d());
+                    m_field.setRobotPose(multipose2D);
+                    SmartDashboard.putNumber("LEFTERROr", Lresult.getMultiTagResult().get().estimatedPose.bestReprojErr);
+
+                    SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
+                    SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
+
+                }
+
+                if (Rresult.getMultiTagResult().isPresent()){
+                    Transform3d fieldToCamera = Rresult.getMultiTagResult().get().estimatedPose.best;
+                    System.out.println("multitag presentR");
+                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), fieldToCamera.getRotation().toRotation2d());
+                    m_field.setRobotPose(multipose2D);
+                    double error = Rresult.getMultiTagResult().get().estimatedPose.bestReprojErr;
+                    SmartDashboard.putNumber("RIGHTERRROr", error);
+
+                    SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
+                    SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
+                }
+
 
 
                 }
