@@ -125,8 +125,8 @@ public class DriveSubsystem extends SubsystemBase {
         //this::setChassisSpeeds,
         (speeds, feedforwards) -> setChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(4.0, 0.0, 0.0), // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+              new PIDConstants(1.0, 0.0, 0.0), // Translation PID constants
+              new PIDConstants(1.0, 0.0, 0.0) // Rotation PID constants
         ),
         driveConfig, // The robot configuration
         () -> {
@@ -148,8 +148,24 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     double VISIONPOSEx = SmartDashboard.getNumber("XPOSEF", m_odometry.getPoseMeters().getX());
     double VISIONPOSEy = SmartDashboard.getNumber("YPOSEF", m_odometry.getPoseMeters().getY());
+
+    boolean LMULTI = SmartDashboard.getBoolean("LMULTITAG", false);
+    boolean RMULTI = SmartDashboard.getBoolean("RMULTITAG", false);
+
     Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
-    m_odometry.resetPose(visionpose);
+
+      m_odometry.update(m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      }
+      );
+      if(LMULTI || RMULTI){
+        m_odometry.resetPose(visionpose);
+      }
+
     SmartDashboard.putData("FieldDRIVE", m_field);
     m_field.setRobotPose(m_odometry.getPoseMeters());
 
@@ -158,19 +174,24 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("drivetrainposeX", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("drivetrainposeY", m_odometry.getPoseMeters().getY());
     //update odometry if vision exists
-    
+
+
+    /*
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        }
-        //,visionpose here
-        //NEED TO GET POSE2D FROM POSE ESTIMATOR IN VISION SUBSYSTEM
-        );
+    m_odometry.update(m_gyro.getRotation2d().times(-1),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      }
+      //,visionpose here
+      //NEED TO GET POSE2D FROM POSE ESTIMATOR IN VISION SUBSYSTEM
+      );
+      */
+
+    
+    
   }
 
   /**

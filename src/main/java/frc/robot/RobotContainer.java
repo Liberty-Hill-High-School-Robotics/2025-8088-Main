@@ -176,8 +176,8 @@ public class RobotContainer {
 
         m_drivesubsystem.drive(
           //inputs from joystick to drive system
-          -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
-          -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
+          -MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
+          -MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kDriveDeadband) * boostRatio * elevatorSlowRatio,
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband) * elevatorSlowRatio,
           true); },
           m_drivesubsystem));

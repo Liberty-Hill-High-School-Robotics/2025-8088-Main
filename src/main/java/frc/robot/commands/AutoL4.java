@@ -22,7 +22,7 @@ public class AutoL4 extends SequentialCommandGroup {
     ){
     
         addCommands(
-            new ElevatorLevelEnd(m_elevator, MotorSpeeds.elevatorL2),
+            new ElevatorLevelEnd(m_elevator, MotorSpeeds.elevatorL4),
             new IntakeOut(m_coral)
             //new ElevatorDownDefault(m_elevator) //TODO: CHECK IF THIS GOES DOWN WHEN THE COMMAND IS NOT RUN!
             );

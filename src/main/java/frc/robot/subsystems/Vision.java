@@ -2,12 +2,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import java.lang.StackWalker.Option;
 import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -300,10 +298,14 @@ public class Vision extends SubsystemBase {
                 //m_field.setRobotPose(robotFieldPose);
                 SmartDashboard.putData("Field", m_field);
 
+                SmartDashboard.putBoolean("LMULTITAG", Lresult.getMultiTagResult().isPresent());
+                SmartDashboard.putBoolean("RMULTITAG", Rresult.getMultiTagResult().isPresent());
+
+
                 if (Lresult.getMultiTagResult().isPresent()){
                     Transform3d fieldToCamera = Lresult.getMultiTagResult().get().estimatedPose.best;
                     System.out.println("multitag presentL");
-                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), fieldToCamera.getRotation().toRotation2d());
+                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
                     m_field.setRobotPose(multipose2D);
                     SmartDashboard.putNumber("LEFTERROr", Lresult.getMultiTagResult().get().estimatedPose.bestReprojErr);
 
@@ -315,7 +317,7 @@ public class Vision extends SubsystemBase {
                 if (Rresult.getMultiTagResult().isPresent()){
                     Transform3d fieldToCamera = Rresult.getMultiTagResult().get().estimatedPose.best;
                     System.out.println("multitag presentR");
-                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), fieldToCamera.getRotation().toRotation2d());
+                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
                     m_field.setRobotPose(multipose2D);
                     double error = Rresult.getMultiTagResult().get().estimatedPose.bestReprojErr;
                     SmartDashboard.putNumber("RIGHTERRROr", error);
