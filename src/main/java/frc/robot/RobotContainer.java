@@ -4,36 +4,44 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.MotorSpeeds;
-import frc.robot.Constants.OIConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import com.pathplanner.lib.auto.*;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-
-//Subsystem imports
-import frc.robot.subsystems.*;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MotorSpeeds;
+import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Align;
 import frc.robot.commands.AutoL4;
+import frc.robot.commands.Coral.Eject;
 import frc.robot.commands.Coral.IntakeIn;
 import frc.robot.commands.Coral.IntakeOut;
+import frc.robot.commands.Coral.PlaceL1;
 //Command importsx
-import frc.robot.commands.Drive.*;
+import frc.robot.commands.Drive.ZeroHeading;
+import frc.robot.commands.Drive.easyAlign;
 import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
+//Subsystem imports
+import frc.robot.subsystems.Algae;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Coral;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Vision;
 
 
 
@@ -211,8 +219,6 @@ public class RobotContainer {
      final Trigger EasyAlignL = m_driverController.square();
      EasyAlignL.whileTrue(new easyAlign(m_drivesubsystem, false));
 
-
-
      //operator joystick
      //elevator setpoints
      final Trigger ElevatorL4 = m_operatorController.y();
@@ -233,6 +239,12 @@ public class RobotContainer {
      final Trigger CoralOUT = m_operatorController.leftBumper();
      CoralOUT.whileTrue(new frc.robot.commands.Coral.IntakeOut(m_coral));
      CoralOUT.onFalse(new ElevatorDownDefault(m_elevator));
+
+     final Trigger PlaceL1 = m_operatorController.povLeft();
+     PlaceL1.whileTrue(new PlaceL1(m_coral));
+
+     final Trigger Eject = m_operatorController.povRight();
+     Eject.whileTrue(new Eject(m_coral));
 
      //left/right offsets
 

@@ -50,12 +50,16 @@ public class Coral extends SubsystemBase {
         coralMotor.set(-MotorSpeeds.coralSpeed);
     }
 
+    public void coralOutReverse(){
+        coralMotor.set(MotorSpeeds.coralSpeed);
+    }
+
     public void coralIn(){
         coralMotor.set(-MotorSpeeds.coralSpeed);
     }
 
     public void coralStop(){
-        coralMotor.stopMotor();
+        coralMotor.set(MotorSpeeds.coralBrakeSpeed);
     }
 
     public boolean coralGetBeam(){
