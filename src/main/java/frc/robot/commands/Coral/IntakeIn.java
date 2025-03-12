@@ -28,7 +28,7 @@ public class IntakeIn extends Command {
 
   @Override 
   public void end(boolean interrupted){
-    m_coral.coralStop();
+    m_coral.coralBrake();
    }
 
   @Override

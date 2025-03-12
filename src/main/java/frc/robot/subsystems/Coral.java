@@ -47,7 +47,7 @@ public class Coral extends SubsystemBase {
     //return true/false if limit is true, or encoder >= x value
 
     public void coralOut(){
-        coralMotor.set(-MotorSpeeds.coralSpeed);
+        coralMotor.set(-MotorSpeeds.coralOutSpeed);
     }
 
     public void coralOutReverse(){
@@ -58,7 +58,11 @@ public class Coral extends SubsystemBase {
         coralMotor.set(-MotorSpeeds.coralSpeed);
     }
 
-    public void coralStop(){
+    public void coralStop() {
+        coralMotor.stopMotor();
+    }
+
+    public void coralBrake(){
         coralMotor.set(MotorSpeeds.coralBrakeSpeed);
     }
 

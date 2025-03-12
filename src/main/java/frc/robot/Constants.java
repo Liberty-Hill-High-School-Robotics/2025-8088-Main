@@ -90,11 +90,12 @@ public final class Constants {
     public static final double elevatorL3 = -88;
     public static final double elevatorL4 = -149;
 
-    public static final double elevatorSpeed = .5;
+    public static final double elevatorSpeed = .55;
     public static final double elevatorSpeedDown = .6;
 
-    public static final double coralSpeed = -.03;
-    public static final double coralBrakeSpeed = -.01;
+    public static final double coralSpeed = -.05;
+    public static final double coralOutSpeed = -.075;
+    public static final double coralBrakeSpeed = -.02;
 
   }
 
