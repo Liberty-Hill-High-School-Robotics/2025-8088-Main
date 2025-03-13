@@ -83,7 +83,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
     NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
     NamedCommands.registerCommand("ElevatorDown", new ElevatorDownDefault(m_elevator));
-
+    NamedCommands.registerCommand("PlaceL1", new PlaceL1(m_coral));
     NamedCommands.registerCommand("CoralIn", new IntakeIn(m_coral));
 
     SmartDashboard.putData("p", new Align(m_drivesubsystem));
@@ -116,9 +116,9 @@ public class RobotContainer {
     
 
     //Climber Exports
-    
 
-    //Coral Exports
+
+    //Coral Export
     
 
     //DriveSubsytem Exports
@@ -232,6 +232,9 @@ public class RobotContainer {
 
      final Trigger ElevatorL1 = m_operatorController.a();
      ElevatorL1.toggleOnTrue(new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL1));
+
+     final Trigger ElevatorDown = m_operatorController.povDown();
+     ElevatorDown.whileTrue(new ElevatorDownDefault(m_elevator));
 
      final Trigger CoralIN = m_operatorController.rightBumper();
      CoralIN.toggleOnTrue(new frc.robot.commands.Coral.IntakeIn(m_coral));
