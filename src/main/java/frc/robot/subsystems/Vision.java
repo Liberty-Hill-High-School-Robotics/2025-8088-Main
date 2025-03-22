@@ -143,8 +143,10 @@ public class Vision extends SubsystemBase {
 
 
         //distance estimator
-        if(RightCamera.isConnected() && LeftCamera.isConnected()){
+        if(RightCamera.isConnected()){// && LeftCamera.isConnected()){
+            
             var Rresult = RightCamera.getLatestResult();
+            /*
             var Lresult = LeftCamera.getLatestResult();
 
             if(Rresult.hasTargets() && Lresult.hasTargets()){
@@ -194,7 +196,7 @@ public class Vision extends SubsystemBase {
                 * tan(b) * B = D
                 * assuming C is the known side
                 //Y = (tan(yaw)) / x
-                */
+                *//*
 
                 //values adjusted for chassis rotation
                 yawR = 90 - yawR;
@@ -298,11 +300,11 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("fieldPOSEA", robotFieldPose.getRotation().getDegrees());
 
 
-                //m_field.setRobotPose(robotFieldPose);
-                SmartDashboard.putData("Field", m_field);
+                
 
                 SmartDashboard.putBoolean("LMULTITAG", Lresult.getMultiTagResult().isPresent());
                 SmartDashboard.putBoolean("RMULTITAG", Rresult.getMultiTagResult().isPresent());
+                
 
 
                 if (Lresult.getMultiTagResult().isPresent()){
@@ -316,29 +318,45 @@ public class Vision extends SubsystemBase {
                     SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
 
                 }
+                    */
+                    //m_field.setRobotPose(robotFieldPose);
+                SmartDashboard.putData("Field", m_field);
 
-                if (Rresult.getMultiTagResult().isPresent()){
-                    Transform3d fieldToCamera = Rresult.getMultiTagResult().get().estimatedPose.best;
-                    System.out.println("multitag presentR");
-                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
-                    m_field.setRobotPose(multipose2D);
-                    double error = Rresult.getMultiTagResult().get().estimatedPose.bestReprojErr;
-                    SmartDashboard.putNumber("RIGHTERRROr", error);
+                if (Rresult.hasTargets()){
+                    if(Rresult.getMultiTagResult().isPresent()){
+                        Transform3d fieldToCamera = Rresult.getMultiTagResult().get().estimatedPose.best;
+                        System.out.println("multitag presentR");
+                        Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
+                        m_field.setRobotPose(multipose2D);
+                        double error = Rresult.getMultiTagResult().get().estimatedPose.bestReprojErr;
+                        SmartDashboard.putNumber("RIGHTERRROr", error);
 
-                    SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
-                    SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
+                        SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
+                        SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
+                    }
+                    else{
+                        Transform3d fieldToCamera = Rresult.getBestTarget().getBestCameraToTarget();
+                        Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
+                        m_field.setRobotPose(multipose2D);
+
+                        SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
+                        SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
+                    }
+                    
+
+                    
                 }
 
 
 
                 }
-                }
-            if(!Lresult.hasTargets() && !Rresult.hasTargets()){
-                SmartDashboard.putNumber("POSEFx", 0);
-                SmartDashboard.putNumber("POSEFy", 0);
-            }
+                //}
+            //if(!Lresult.hasTargets() && !Rresult.hasTargets()){
+            //    SmartDashboard.putNumber("POSEFx", 0);
+           //     SmartDashboard.putNumber("POSEFy", 0);
+            //}
         }
-    }
+   // }
 
 
 
