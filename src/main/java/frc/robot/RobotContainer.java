@@ -102,7 +102,7 @@ public class RobotContainer {
     //example
     //SmartDashboard.putData("AmpPlayoff", new PathPlannerAuto("AmpPlayoff"));
     SmartDashboard.putData("easy", new PathPlannerAuto("easy"));
-    SmartDashboard.putData("MOVEHYES", new PathPlannerAuto("MOVEHYES"));
+    SmartDashboard.putData("MOVEHYES", new PathPlannerAuto("MOVE"));
     SmartDashboard.putData("brand", new PathPlannerAuto("brand"));
 
 

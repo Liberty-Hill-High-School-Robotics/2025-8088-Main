@@ -31,7 +31,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -157,7 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
     boolean LMULTI = SmartDashboard.getBoolean("LMULTITAG", false);
     boolean RMULTI = SmartDashboard.getBoolean("RMULTITAG", false);
 
-    //Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
+    Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
 
       m_odometry.update(m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -167,11 +166,10 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       }
       );
-      /*
+      
       if(LMULTI || RMULTI){
         m_odometry.resetPose(visionpose);
       }
-        */
 
     publisher.set(m_odometry.getPoseMeters());
 
