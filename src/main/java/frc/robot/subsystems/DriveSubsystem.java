@@ -30,6 +30,9 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -144,6 +147,8 @@ public class DriveSubsystem extends SubsystemBase {
 );
   }
 
+  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("pose", Pose2d.struct).publish();
+
   @Override
   public void periodic() {
     double VISIONPOSEx = SmartDashboard.getNumber("XPOSEF", m_odometry.getPoseMeters().getX());
@@ -152,7 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
     boolean LMULTI = SmartDashboard.getBoolean("LMULTITAG", false);
     boolean RMULTI = SmartDashboard.getBoolean("RMULTITAG", false);
 
-    Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
+    //Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
 
       m_odometry.update(m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -162,9 +167,13 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       }
       );
+      /*
       if(LMULTI || RMULTI){
         m_odometry.resetPose(visionpose);
       }
+        */
+
+    publisher.set(m_odometry.getPoseMeters());
 
     SmartDashboard.putData("FieldDRIVE", m_field);
     m_field.setRobotPose(m_odometry.getPoseMeters());
@@ -177,7 +186,7 @@ public class DriveSubsystem extends SubsystemBase {
 
 
     /*
-    // Update the odometry in the periodic block
+    // Update the odometry in the periodior block
     m_odometry.update(m_gyro.getRotation2d().times(-1),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -420,9 +429,11 @@ public class DriveSubsystem extends SubsystemBase {
     //TODO make this not run way to the right if tag not seen 
 
     //get tag angle
-    double Langle = SmartDashboard.getNumber("poseLRT", m_gyro.getYaw().getValueAsDouble());
-    double Rangle = SmartDashboard.getNumber("poseRRT", m_gyro.getYaw().getValueAsDouble());
+    double Langle = SmartDashboard.getNumber("PoseLRT", m_gyro.getYaw().getValueAsDouble());
+    double Rangle = SmartDashboard.getNumber("PoseRRT", m_gyro.getYaw().getValueAsDouble());
     double asetpoint = m_gyro.getYaw().getValueAsDouble(); //init as default value, is changed later
+    int LtagID = (int )SmartDashboard.getNumber("LTagID", 0); //get tag ID to see if it exists
+    int RtagID = (int )SmartDashboard.getNumber("RTagID", 0); //get tag ID to see if it exists
 
     //create setpoints for x and y TODO: send to constants.java
     double xLsetpoint = DriveConstants.leftXOffset;
@@ -432,10 +443,11 @@ public class DriveSubsystem extends SubsystemBase {
     //get x and y from smartdashboard (and rotation of target)
     //TODO either update drivetrain pose to get close tag tracking or make dummy default values?
     //TODO maybe add a timeout ^
-
+    int tagId = LtagID;
     asetpoint = Rangle;
     if(Right){
       asetpoint = Langle;
+      tagId = RtagID;
     }
     double VisionY = SmartDashboard.getNumber("POSEFy", xRsetpoint);
     double VisionX = SmartDashboard.getNumber("POSEFx", 0);
@@ -450,12 +462,12 @@ public class DriveSubsystem extends SubsystemBase {
     double calcX = SidewaysPID.calculate(VisionX, ysetpoint);
     double calcA = RotationPID.calculate(VisionA, asetpoint);
     
-
-    //create a chassisspeed class given these values
-    ChassisSpeeds controlledSpeeds = new ChassisSpeeds(calcX, calcY, calcA);
-    //command drivetrain with x, y and omega
-    setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
-
+    if (true) { //TODO change this to smthing that detects if camera has tag
+      //create a chassisspeed class given these values
+      ChassisSpeeds controlledSpeeds = new ChassisSpeeds(calcX, calcY, calcA);
+      //command drivetrain with x, y and omega
+      setModuleStates(DriveConstants.KINEMATICS.toSwerveModuleStates(controlledSpeeds));
+    }
   }
 
 }

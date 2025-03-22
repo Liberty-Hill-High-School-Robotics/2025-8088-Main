@@ -136,13 +136,14 @@ public class RobotContainer {
 
 
     //LEDs Exports
+    
 
     //------------------------------------- Other Exports ------------------------------------
     //SemiAuto Commands
 
 
     //Other
-
+    SmartDashboard.putData("ZeroHeading", new ZeroHeading(m_drivesubsystem));
 
     //------------------------------------------------------------------------------------------
     //------------------------------ End of SmartDashboard Exports------------------------------

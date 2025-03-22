@@ -19,6 +19,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -59,7 +60,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.m_drivesubsystem.zeroHeading();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    
+    
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
      * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
@@ -86,6 +88,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    
   }
 
   /** This function is called periodically during operator control. */

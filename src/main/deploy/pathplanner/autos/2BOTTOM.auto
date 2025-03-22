@@ -11,9 +11,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "ElevatorL4Auto"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "PlaceL1"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.75
+                }
+              }
+            ]
           }
         },
         {
@@ -24,12 +37,6 @@
                 "type": "path",
                 "data": {
                   "pathName": "BOTTOMCYCLE2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ElevatorDown"
                 }
               },
               {

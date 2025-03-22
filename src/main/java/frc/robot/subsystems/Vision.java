@@ -105,6 +105,8 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("poseLXT", Ltargetpose.get().getX());
                 SmartDashboard.putNumber("poseLYT", Ltargetpose.get().getY());
                 SmartDashboard.putNumber("poseLRT", Ltargetpose.get().getRotation().getAngle());
+                SmartDashboard.putNumber("LTagID", Lbesttarget.objDetectId);
+
             }
         }
 
@@ -135,6 +137,7 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("poseRXT", Rtargetpose.get().getX());
                 SmartDashboard.putNumber("poseRYT", Rtargetpose.get().getY());
                 SmartDashboard.putNumber("poseRRT", Rtargetpose.get().getRotation().getAngle());
+                SmartDashboard.putNumber("RTagID", Rbesttarget.objDetectId);
             }
         }
 
