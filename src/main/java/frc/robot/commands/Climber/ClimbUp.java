@@ -18,17 +18,17 @@ public class ClimbUp extends Command {
 
   @Override
   public void initialize() {
-   
+
   }
 
   @Override
   public void execute(){
-
+    m_climber.climberUp();
   }
 
   @Override 
   public void end(boolean interrupted){
-
+    m_climber.climberStop();
    }
 
   @Override

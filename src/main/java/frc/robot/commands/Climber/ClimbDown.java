@@ -18,18 +18,18 @@ public class ClimbDown extends Command {
 
   @Override
   public void initialize() {
-   
+
   }
 
   @Override
   public void execute(){
-
+    m_climber.climberDown();
   }
 
   @Override 
   public void end(boolean interrupted){
-
-   }
+    m_climber.climberStop();
+  }
 
   @Override
   public boolean isFinished() {

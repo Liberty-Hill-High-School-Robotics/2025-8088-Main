@@ -68,6 +68,7 @@ public final class Constants {
     public static final int GyroID = 9;
     public static final int elevatorMotorID = 10;
     public static final int coralMotorID = 11;
+    public static final int climberMotorID = 12;
 
 
   }
@@ -96,6 +97,9 @@ public final class Constants {
     public static final double coralSpeed = -.05;
     public static final double coralOutSpeed = -.075;
     public static final double coralBrakeSpeed = -.02;
+
+    public static final double climberUpSpeed = .5;
+    public static final double climberDownSpeed = .5;
 
   }
 
