@@ -98,8 +98,13 @@ public final class Constants {
     public static final double coralOutSpeed = -.075;
     public static final double coralBrakeSpeed = -.02;
 
-    public static final double climberUpSpeed = .5;
-    public static final double climberDownSpeed = .5;
+    public static final double climberUpSpeed = 1;
+    public static final double climberDownSpeed = 1;
+
+    //climber PID constants
+    public static final double cP = .05;
+    public static final double cI = 0;
+    public static final double cD = 0;
 
   }
 
