@@ -28,7 +28,7 @@ public class Climber extends SubsystemBase {
         climberSparkMax = new SparkMax(CanIDs.climberMotorID, MotorType.kBrushless);
         climberPID = climberSparkMax.getClosedLoopController();
         SparkMaxConfig config = new SparkMaxConfig();
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).p(MotorSpeeds.cP).i(MotorSpeeds.cI).d(MotorSpeeds.cD).velocityFF(1/473); //reciprocal of the motor's velocity constant
+        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(MotorSpeeds.cP, MotorSpeeds.cI, MotorSpeeds.cD, 1/473); //reciprocal of the motor's velocity constant
         climberSparkMax.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 

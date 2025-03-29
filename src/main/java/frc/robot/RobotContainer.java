@@ -24,6 +24,8 @@ import frc.robot.Constants.MotorSpeeds;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Align;
 import frc.robot.commands.AutoL4;
+import frc.robot.commands.Climber.ClimbDown;
+import frc.robot.commands.Climber.ClimbUp;
 import frc.robot.commands.Coral.Eject;
 import frc.robot.commands.Coral.IntakeIn;
 import frc.robot.commands.Coral.IntakeOut;
@@ -249,6 +251,12 @@ public class RobotContainer {
 
      final Trigger Eject = m_operatorController.povRight();
      Eject.whileTrue(new Eject(m_coral));
+
+     final Trigger ClimbDown = m_operatorController.povDown();
+     ClimbDown.whileTrue(new ClimbDown(m_climber));
+
+     final Trigger ClimbUp = m_operatorController.povUp();
+     ClimbUp.whileTrue(new ClimbUp(m_climber));
 
      //left/right offsets
 
