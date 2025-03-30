@@ -118,7 +118,8 @@ public class RobotContainer {
     
 
     //Climber Exports
-
+    SmartDashboard.putData("climber up", new ClimbUp(m_climber));
+    SmartDashboard.putData("climber down", new ClimbDown(m_climber));
 
     //Coral Export
     
@@ -222,6 +223,12 @@ public class RobotContainer {
      final Trigger EasyAlignL = m_driverController.square();
      EasyAlignL.whileTrue(new easyAlign(m_drivesubsystem, false));
 
+     final Trigger ClimbDown = m_driverController.povDown();
+     ClimbDown.whileTrue(new ClimbDown(m_climber));
+
+     final Trigger ClimbUp = m_driverController.povUp();
+     ClimbUp.whileTrue(new ClimbUp(m_climber));
+
      //operator joystick
      //elevator setpoints
      final Trigger ElevatorL4 = m_operatorController.y();
@@ -251,12 +258,6 @@ public class RobotContainer {
 
      final Trigger Eject = m_operatorController.povRight();
      Eject.whileTrue(new Eject(m_coral));
-
-     final Trigger ClimbDown = m_operatorController.povDown();
-     ClimbDown.whileTrue(new ClimbDown(m_climber));
-
-     final Trigger ClimbUp = m_operatorController.povUp();
-     ClimbUp.whileTrue(new ClimbUp(m_climber));
 
      //left/right offsets
 

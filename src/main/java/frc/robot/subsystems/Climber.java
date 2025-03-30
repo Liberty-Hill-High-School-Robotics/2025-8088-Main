@@ -4,8 +4,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -28,7 +28,7 @@ public class Climber extends SubsystemBase {
         climberSparkFlex = new SparkFlex(CanIDs.climberMotorID, MotorType.kBrushless);
         climberPID = climberSparkFlex.getClosedLoopController();
         SparkFlexConfig config = new SparkFlexConfig();
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(MotorSpeeds.cP, MotorSpeeds.cI, MotorSpeeds.cD, 1/473); //reciprocal of the motor's velocity constant
+        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(MotorSpeeds.cP, MotorSpeeds.cI, MotorSpeeds.cD, 1/565); //reciprocal of the motor's velocity constant
         climberSparkFlex.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -51,7 +51,7 @@ public class Climber extends SubsystemBase {
         climberPID.setReference(MotorSpeeds.climberUpSpeed, ControlType.kVelocity);
     }
     public void climberDown() {
-        climberPID.setReference(-MotorSpeeds.climberDownSpeed, ControlType.kVelocity);
+        climberPID.setReference(-   MotorSpeeds.climberDownSpeed, ControlType.kVelocity);
     }
     public void climberStop() {
         climberSparkFlex.set(0);
