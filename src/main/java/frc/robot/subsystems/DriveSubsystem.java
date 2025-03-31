@@ -150,11 +150,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double VISIONPOSEx = SmartDashboard.getNumber("XPOSEF", m_odometry.getPoseMeters().getX());
-    double VISIONPOSEy = SmartDashboard.getNumber("YPOSEF", m_odometry.getPoseMeters().getY());
+    double VISIONPOSEx = SmartDashboard.getNumber("XPOSE", m_odometry.getPoseMeters().getX());
+    double VISIONPOSEy = SmartDashboard.getNumber("YPOSE", m_odometry.getPoseMeters().getY());
 
-    boolean LMULTI = SmartDashboard.getBoolean("LMULTITAG", false);
-    boolean RMULTI = SmartDashboard.getBoolean("RMULTITAG", false);
+    boolean pose = SmartDashboard.getBoolean("TARGET", false);
 
     Pose2d visionpose = new Pose2d(VISIONPOSEx, VISIONPOSEy, m_gyro.getRotation2d());
 
@@ -167,7 +166,7 @@ public class DriveSubsystem extends SubsystemBase {
       }
       );
       
-      if(LMULTI || RMULTI){
+      if(pose){
         m_odometry.resetPose(visionpose);
       }
 

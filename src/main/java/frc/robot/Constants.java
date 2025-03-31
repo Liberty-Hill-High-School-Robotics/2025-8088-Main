@@ -58,6 +58,21 @@ public final class Constants {
   public static final double gyroHeightMeters = 1;
 
 
+
+  //newLL constants
+  //offsets 
+  /*
+  * x = 7.5in forwards
+  * y = 1in left
+  * z = 5 3/4in up
+  * r = 0
+  * p = 5
+  * y = 0
+  */
+  public static final Transform3d LLCAMERAOFFSET = new Transform3d
+  (Units.inchesToMeters(-7.5), Units.inchesToMeters(1), Units.inchesToMeters(5.75), new Rotation3d(0, 5, 0));
+
+
   }
   //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 
@@ -98,8 +113,8 @@ public final class Constants {
     public static final double coralOutSpeed = -.075;
     public static final double coralBrakeSpeed = -.02;
 
-    public static final double climberUpSpeed = 500;
-    public static final double climberDownSpeed = 400;
+    public static final double climberUpSpeed = 2000;
+    public static final double climberDownSpeed = 1500;
 
     //climber PID constants
     public static final double cP = .000125;

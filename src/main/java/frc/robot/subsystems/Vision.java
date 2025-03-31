@@ -1,10 +1,8 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meter;
 
 import java.util.Optional;
 
-import javax.naming.spi.DirStateFactory.Result;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -16,8 +14,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -56,44 +52,57 @@ public class Vision extends SubsystemBase {
             // Get the current best target.
 
             if(LLResult.hasTargets()){
+                SmartDashboard.putBoolean("TARGET", true);
                 //get all usable data from target:
                 //yaw, pitch, area, ID, pose, height
                 PhotonTrackedTarget LLbesttarget = LLResult.getBestTarget();
                 int LLtargetID = LLbesttarget.getFiducialId();
-                Optional<Pose3d> LLtargetpose = aprilTagFieldLayout.getTagPose(LLtargetID);
+                Pose3d LLtargetpose = aprilTagFieldLayout.getTagPose(LLtargetID).get();
 
-                SmartDashboard.putNumber("TAGPOSEX", LLtargetpose.get().getX());
-                SmartDashboard.putNumber("TAGPOSEY", LLtargetpose.get().getY());
-                SmartDashboard.putNumber("TAGPOSEANGLE", LLtargetpose.get().getRotation().getAngle());
+                //offsets 
+                /*
+                 * x = 7.5in forwards
+                 * y = 1in left
+                 * z = 5 3/4in up
+                 * r = 0
+                 */
+
+                SmartDashboard.putNumber("TAGPOSEX", LLtargetpose.getX());
+                SmartDashboard.putNumber("TAGPOSEY", LLtargetpose.getY());
+                SmartDashboard.putNumber("TAGPOSEANGLE", LLtargetpose.getRotation().getAngle());
                 SmartDashboard.putNumber("LTagID", LLbesttarget.objDetectId);
 
-            }
 
-            //get single tag result if it exists
-            if(LLResult.hasTargets()){
+
+                //get single tag result if it exists
                 Transform3d SinglePose = LLResult.getBestTarget().getBestCameraToTarget();
-                Pose2d SinglePose2d = new Pose2d(SinglePose.getX(), SinglePose.getY(), m_gyro.getRotation2d());
+                Pose3d FinalSinglePose = PhotonUtils.estimateFieldToRobotAprilTag(SinglePose, LLtargetpose, visionData.LLCAMERAOFFSET);
                 double error = LLResult.getBestTarget().getPoseAmbiguity();
-                if(error <= 2){
-                    System.out.println("SINGLE TAG ERROR < 2, UPDATING POSE");
-                    m_field.setRobotPose(SinglePose2d);
+                if(error <= .6){
+                    System.out.println("INFO: SINGLE TAG RANGE < 2, UPDATING POSE");
+                    m_field.setRobotPose(FinalSinglePose.toPose2d());
+                }
+                else{
+                    System.out.println("INFO: SINGLE TAG RANGE > 2, NOT UPDATING POSE");
                 }
                 SmartDashboard.putNumber("ST ERROR", error);
-                SmartDashboard.putNumber("ST X", SinglePose.getX());
-                SmartDashboard.putNumber("ST Y", SinglePose.getY());
-            }
+                SmartDashboard.putNumber("XPOSE", FinalSinglePose.getX());
+                SmartDashboard.putNumber("YPOSE", FinalSinglePose.getY());
             //override pose if multitag result exists
             if(LLResult.getMultiTagResult().isPresent()){
                 Transform3d fieldToCamera = LLResult.getMultiTagResult().get().estimatedPose.best;
-                System.out.println("multitag present LL");
+                System.out.println("INFO: MULTI-TAG EXISTS, UPDATING POSE");
                 Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
                 m_field.setRobotPose(multipose2D);
                 SmartDashboard.putNumber("MT ERROR", LLResult.getMultiTagResult().get().estimatedPose.bestReprojErr);
-                SmartDashboard.putNumber("MT X", multipose2D.getX());
-                SmartDashboard.putNumber("MT Y", multipose2D.getY());
+                SmartDashboard.putNumber("XPOSE", multipose2D.getX());
+                SmartDashboard.putNumber("YPOSE", multipose2D.getY());
             }
-
             SmartDashboard.putData("Field", m_field);
+            }
+            else{
+                SmartDashboard.putBoolean("TARGET", false);
+            }
         }          
     }
 
