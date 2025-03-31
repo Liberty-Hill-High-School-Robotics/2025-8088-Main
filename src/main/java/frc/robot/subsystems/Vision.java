@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Meter;
 
 import java.util.Optional;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -30,29 +32,15 @@ import frc.robot.Constants.visionData;
 public class Vision extends SubsystemBase {
 
     //make sure the name in quotes is EXACTLY the same as it is in PV
-    PhotonCamera LeftCamera = new PhotonCamera("USB CAM L (High)");
-    PhotonCamera RightCamera = new PhotonCamera("USB CAM R (High)");
+    PhotonCamera Limelight = new PhotonCamera("Limelight");
     public final Pigeon2 m_gyro = new Pigeon2(CanIDs.GyroID);
-
-    //init objects and such
-    public final double xLeftOffset = visionData.robotToCamLeft.getY();
-    public final double xRightOffset = visionData.robotToCamRight.getY();
-
-    public final double xDistance = 0.356;
-    double D = 0;
-    boolean same = false;
-    double output;
-    double outputy;
-    double calcYaw = 0;
     private final Field2d m_field = new Field2d();
-
-
-
     // The field from AprilTagFields will be different depending on the game.
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     public Vision(){
-    
+        //initalization here
+        //none needed ^ 
     }
 
 
@@ -62,290 +50,52 @@ public class Vision extends SubsystemBase {
         //Put smartdashboard stuff, check for limit switches, etc
         //You can retrieve the latest pipeline result using the PhotonCamera instance."
         // Check if the latest result has any targets.
-        //boolean hasTargets = result.hasTargets();
-        // Get a list of currently tracked targets.
-        //List<PhotonTrackedTarget> targets = result.getTargets();
-
-        /*
-         * Get values and data from both cameras, provided they exist (code WILL crash if you dont check)
-         * Take values and calculate distance, needed yaw of target and dis. between cameras
-         * Tan(YAW) * (Dis/2) = D
-         * D = distance of a horizontal line between center of A.T. and the centerpoint between both cameras
-         * This math MIGHT work, needs to be tested (ive been thinking about it and it truly is math)
-         * HYP should be distance straight line, not aligned to X axis (top down view)
-         * 
-         */
-    
-
-        //LEFTCAMERA VALUES
-        if(LeftCamera.isConnected()){
-            var Lresult = LeftCamera.getLatestResult();
+        //GetLL Values
+        if(Limelight.isConnected()){
+            var LLResult = Limelight.getLatestResult();
             // Get the current best target.
 
-            if(Lresult.hasTargets()){
-
+            if(LLResult.hasTargets()){
                 //get all usable data from target:
                 //yaw, pitch, area, ID, pose, height
-                PhotonTrackedTarget Lbesttarget = Lresult.getBestTarget();
-                // double Lyaw = Lbesttarget.getYaw();
-                // double Lpitch = Lbesttarget.getPitch();
-                //double Larea = Lbesttarget.getArea();
-                int LtargetID = Lbesttarget.getFiducialId();
-                Optional<Pose3d> Ltargetpose = aprilTagFieldLayout.getTagPose(LtargetID);
-                double Ltargetheight = Ltargetpose.get().getMeasureZ().abs(Meter);
-                Pose2d Ltargetpose2D = Ltargetpose.get().toPose2d();
-                
+                PhotonTrackedTarget LLbesttarget = LLResult.getBestTarget();
+                int LLtargetID = LLbesttarget.getFiducialId();
+                Optional<Pose3d> LLtargetpose = aprilTagFieldLayout.getTagPose(LLtargetID);
 
-                Pose2d robotPoseL = PhotonUtils.estimateFieldToRobot(        
-                visionData.leftCamHeight, Ltargetheight, visionData.leftCamPitch, (Lbesttarget.pitch * (Math.PI/180)),
-                Rotation2d.fromDegrees(-Lbesttarget.getYaw()), m_gyro.getRotation2d(), Ltargetpose2D, visionData.robotToCamLeft2D);
-                SmartDashboard.putNumber("poseLX", robotPoseL.getX());
-                SmartDashboard.putNumber("poseLY", robotPoseL.getY());
-                SmartDashboard.putNumber("poseLR", robotPoseL.getRotation().getDegrees());
-                SmartDashboard.putNumber("poseLXT", Ltargetpose.get().getX());
-                SmartDashboard.putNumber("poseLYT", Ltargetpose.get().getY());
-                SmartDashboard.putNumber("poseLRT", Ltargetpose.get().getRotation().getAngle());
-                SmartDashboard.putNumber("LTagID", Lbesttarget.objDetectId);
+                SmartDashboard.putNumber("TAGPOSEX", LLtargetpose.get().getX());
+                SmartDashboard.putNumber("TAGPOSEY", LLtargetpose.get().getY());
+                SmartDashboard.putNumber("TAGPOSEANGLE", LLtargetpose.get().getRotation().getAngle());
+                SmartDashboard.putNumber("LTagID", LLbesttarget.objDetectId);
 
             }
-        }
 
-        //RIGHTCAMERA VALUES
-        if(RightCamera.isConnected()){
-            var Rresult = LeftCamera.getLatestResult();
-            // Get the current best target.
-
-            if(Rresult.hasTargets()){
-
-                //get all usable data from target:
-                //yaw, pitch, area, ID, pose, height
-                PhotonTrackedTarget Rbesttarget = Rresult.getBestTarget();
-                //double Ryaw = Rbesttarget.getYaw();
-                //double Rpitch = Rbesttarget.getPitch();
-                //double Rarea = Rbesttarget.getArea();
-                int RtargetID = Rbesttarget.getFiducialId();
-                Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(RtargetID);
-                double Rtargetheight = Rtargetpose.get().getMeasureZ().abs(Meter);
-                Pose2d Rtargetpose2D = Rtargetpose.get().toPose2d();
-                
-                Pose2d robotPoseR = PhotonUtils.estimateFieldToRobot(   
-                visionData.rightCamHeight, Rtargetheight, visionData.rightCamPitch, (Rbesttarget.pitch * (Math.PI/180)),
-                Rotation2d.fromDegrees(-Rbesttarget.getYaw()), m_gyro.getRotation2d(), Rtargetpose2D, visionData.robotToCamLeft2D);
-                SmartDashboard.putNumber("poseRX", robotPoseR.getX());
-                SmartDashboard.putNumber("poseRY", robotPoseR.getY());
-                SmartDashboard.putNumber("poseRR", robotPoseR.getRotation().getDegrees());
-                SmartDashboard.putNumber("poseRXT", Rtargetpose.get().getX());
-                SmartDashboard.putNumber("poseRYT", Rtargetpose.get().getY());
-                SmartDashboard.putNumber("poseRRT", Rtargetpose.get().getRotation().getAngle());
-                SmartDashboard.putNumber("RTagID", Rbesttarget.objDetectId);
+            //get single tag result if it exists
+            if(LLResult.hasTargets()){
+                Transform3d SinglePose = LLResult.getBestTarget().getBestCameraToTarget();
+                Pose2d SinglePose2d = new Pose2d(SinglePose.getX(), SinglePose.getY(), m_gyro.getRotation2d());
+                double error = LLResult.getBestTarget().getPoseAmbiguity();
+                if(error <= 2){
+                    System.out.println("SINGLE TAG ERROR < 2, UPDATING POSE");
+                    m_field.setRobotPose(SinglePose2d);
+                }
+                SmartDashboard.putNumber("ST ERROR", error);
+                SmartDashboard.putNumber("ST X", SinglePose.getX());
+                SmartDashboard.putNumber("ST Y", SinglePose.getY());
             }
-        }
-
-
-        //distance estimator
-        if(RightCamera.isConnected() && LeftCamera.isConnected()){
-            var Rresult = RightCamera.getLatestResult();
-            var Lresult = LeftCamera.getLatestResult();
-
-            if(Rresult.hasTargets() && Lresult.hasTargets()){
-
-                var LID = Lresult.getBestTarget().fiducialId;
-                var RID = Rresult.getBestTarget().fiducialId;
-                //check if targetID same
-                if(RID != LID){
-                    SmartDashboard.putString("targetsame", "NO");
-                }
-                else{
-                SmartDashboard.putString("targetsame", "YES");
-                double yawR = Rresult.getBestTarget().yaw;
-                SmartDashboard.putNumber("RIGHTYAW", yawR);
-                double yawL = Lresult.getBestTarget().yaw;
-                double yawRB = Rresult.getBestTarget().yaw;
-                double yawLB = Lresult.getBestTarget().yaw;
-                double c;
-                double A;
-                double Y;
-                double yawC = m_gyro.getYaw().getValueAsDouble();
-                yawC = Math.abs(yawC % 360);
-                //get yaw on a scale of 0-360
-                if(yawC < 90 && yawC > 0){
-                    yawC = Math.abs(90 - yawC);
-                    //get difference to 90 if yaw between 0 and 90
-                }
-                else{
-                    yawC = yawC % 90;
-                    //return otherwise if not between 0 and 90
-                }
-
-                /*
-                * Math process:
-                * First, normalize yaw values
-                * calculate (gyro rotation - pose rotation)
-                * yaw = yaw - calculated value
-                * ^ that will normalize yaw so it works if chassis is not 90­°
-                * 
-                * take ASA (angle side angle), solve for missing angle
-                * plug into law of sines
-                * A/sin(a) = B/sin(b) = C/sin(c)
-                * 
-                * solve for missing side, either one
-                * tan(a) * A = D
-                * or
-                * tan(b) * B = D
-                * assuming C is the known side
-                //Y = (tan(yaw)) / x
-                */
-
-                //values adjusted for chassis rotation
-                yawR = 90 - yawR;
-                yawL = 90 + yawL;
-                c = 180 - yawR - yawL;
-                //find missing angle
-            
-                //convert values to radians
-                double radyawR = yawR * (Math.PI/180);
-                double radyawL = yawL *(Math.PI/180);
-                double radc = c * (Math.PI/180);
-
-                
-                //check if target is centered, offsetleft, or offset right
-                if(yawLB > 0 && yawRB < 0){
-                    //robot centered between both cameras
-                    A = (xDistance / Math.sin(radc)) * Math.sin(radyawR);
-                    D = Math.sin(radyawL) * A;
-                    Y = D / (Math.tan(radyawL));
-                    outputy = Y + xLeftOffset;
-                    output = D;
-
-                    SmartDashboard.putNumber("dvalueCentered", D);
-                }
-                if(yawLB < 0 && yawRB < 0){
-                    //robot is offset on the right
-                    A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawL - Math.PI));
-                    D = A * Math.sin(radyawR);
-                    Y = D / (Math.tan(radyawL));
-                    outputy = Y + xLeftOffset;
-                    output = D;
-
-                    SmartDashboard.putNumber("dvalueRight", D);
-
-                }
-                if (yawLB > 0 && yawRB > 0){
-                    //robot is offset on the left
-                    A = (xDistance / Math.sin(radc)) * Math.sin(Math.abs(radyawR - Math.PI));
-                    D = A * Math.sin(radyawL);
-                    Y = D / (Math.tan(radyawR));
-                    
-                    outputy = (-Y) + xRightOffset;
-                    output = D;
-
-                    SmartDashboard.putNumber("dvalueLeft", D);
-                }
-
-                SmartDashboard.putNumber("yawl", radyawL);
-                SmartDashboard.putNumber("yawR", radyawR);
-                SmartDashboard.putNumber("c", radc);
-                SmartDashboard.putNumber("outputvalue", D);
-
-                //calculate yaw from ROBOT to target, using difference in yaw from cameras
-                //Rotation2d chassisRotation2d= Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble());
-                if(yawLB > yawRB){
-                    calcYaw = yawLB - yawRB;
-                }
-                else if(yawLB < yawRB){
-                    calcYaw = yawRB - yawLB;
-                }
-                //get robot yaw to target
-                //Rotation2d yawRobot = Rotation2d.fromDegrees(calcYaw);
-                //get target pose
-                Optional<Pose3d> Rtargetpose = aprilTagFieldLayout.getTagPose(Rresult.getBestTarget().fiducialId);
-                
-
-
-                //TODO calculate proper Y values for two cameras, do not use library stuff
-                //calculate camera to target translation using robot yaw and distance to target (x axis only)
-                //var localpose = PhotonUtils.estimateCameraToTargetTranslation(output, yawRobot);
-                //calculate robot pose from the camera to target translation, given localpose, target pose, and gyro angle
-                //var pose = PhotonUtils.estimateCameraToTarget(localpose, Rtargetpose.get().toPose2d(), chassisRotation2d);
-
-                // pose
-                Pose2d pose2D = new Pose2d(output, outputy, m_gyro.getRotation2d());
-
-                //get yaw to target given pose(s)
-                Rotation2d yawtotarget = PhotonUtils.getYawToPose(pose2D, Rtargetpose.get().toPose2d());
-
-                SmartDashboard.putNumber("POSEFx", pose2D.getX());
-                SmartDashboard.putNumber("POSEFy", pose2D.getY());
-                SmartDashboard.putNumber("POSEFa", pose2D.getRotation().getDegrees());
-                SmartDashboard.putNumber("POSEYAW", yawtotarget.getDegrees());
-                //Pose3d fieldpose = PhotonUtils.estimateFieldToRobotAprilTag(robotToTag, Rtargetpose.get(), visionData.robotToCamLeft);
-               // SmartDashboard.putNumber("robotFieldX", fieldpose.getX());
-                //SmartDashboard.putNumber("robotFieldX", fieldpose.getY());
-                //SmartDashboard.putNumber("robotFieldX", fieldpose.getZ());
-
-
-                //get robot to tag
-                Transform2d robotToTag = new Transform2d(output, outputy, m_gyro.getRotation2d());
-
-                //create robot to cam
-                Transform2d camCenterToGyro = new Transform2d(0.2413, 0.0, m_gyro.getRotation2d());
-                //camCenterToGyro = visionData.robotToCamLeft2D;
-
-                //need transform2 camera to target, 
-                Pose2d robotFieldPose = PhotonUtils.estimateFieldToRobot(robotToTag, Rtargetpose.get().toPose2d(), camCenterToGyro);
-                SmartDashboard.putNumber("fieldPOSEx", robotFieldPose.getX());
-                SmartDashboard.putNumber("fieldPOSEY", robotFieldPose.getY());
-                SmartDashboard.putNumber("fieldPOSEA", robotFieldPose.getRotation().getDegrees());
-
-
-                //m_field.setRobotPose(robotFieldPose);
-                SmartDashboard.putData("Field", m_field);
-
-                SmartDashboard.putBoolean("LMULTITAG", Lresult.getMultiTagResult().isPresent());
-                SmartDashboard.putBoolean("RMULTITAG", Rresult.getMultiTagResult().isPresent());
-
-
-                if (Lresult.getMultiTagResult().isPresent()){
-                    Transform3d fieldToCamera = Lresult.getMultiTagResult().get().estimatedPose.best;
-                    System.out.println("multitag presentL");
-                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
-                    m_field.setRobotPose(multipose2D);
-                    SmartDashboard.putNumber("LEFTERROr", Lresult.getMultiTagResult().get().estimatedPose.bestReprojErr);
-
-                    SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
-                    SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
-
-                }
-
-                if (Rresult.getMultiTagResult().isPresent()){
-                    Transform3d fieldToCamera = Rresult.getMultiTagResult().get().estimatedPose.best;
-                    System.out.println("multitag presentR");
-                    Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
-                    m_field.setRobotPose(multipose2D);
-                    double error = Rresult.getMultiTagResult().get().estimatedPose.bestReprojErr;
-                    SmartDashboard.putNumber("RIGHTERRROr", error);
-
-                    SmartDashboard.putNumber("XPOSEF", multipose2D.getX());
-                    SmartDashboard.putNumber("YPOSEF", multipose2D.getY());
-                }
-
-
-
-                }
-                }
-            if(!Lresult.hasTargets() && !Rresult.hasTargets()){
-                SmartDashboard.putNumber("POSEFx", 0);
-                SmartDashboard.putNumber("POSEFy", 0);
+            //override pose if multitag result exists
+            if(LLResult.getMultiTagResult().isPresent()){
+                Transform3d fieldToCamera = LLResult.getMultiTagResult().get().estimatedPose.best;
+                System.out.println("multitag present LL");
+                Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
+                m_field.setRobotPose(multipose2D);
+                SmartDashboard.putNumber("MT ERROR", LLResult.getMultiTagResult().get().estimatedPose.bestReprojErr);
+                SmartDashboard.putNumber("MT X", multipose2D.getX());
+                SmartDashboard.putNumber("MT Y", multipose2D.getY());
             }
-        }
+
+            SmartDashboard.putData("Field", m_field);
+        }          
     }
-
-
-
-        //-------------------------------------------------
-        //smartdashboardstuff
-
-    
 
     @Override
     public void simulationPeriodic() {
@@ -359,11 +109,4 @@ public class Vision extends SubsystemBase {
 
     //as well as check for limits and reset encoders,
     //return true/false if limit is true, or encoder >= x value
-
-    //public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
-        
-       // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-       // return photonPoseEstimator.update(result);
-   // }
-
 }
