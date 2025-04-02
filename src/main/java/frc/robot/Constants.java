@@ -80,6 +80,7 @@ public final class Constants {
     //can IDs
     public static final int BlinkinPWMPort = 0;
     public static final int BeamDIOPort = 0;
+    public static final int ClimberBeamDIOPort = 1;
     public static final int GyroID = 9;
     public static final int elevatorMotorID = 10;
     public static final int coralMotorID = 11;
@@ -115,6 +116,9 @@ public final class Constants {
 
     public static final double climberUpSpeed = 2000;
     public static final double climberDownSpeed = 1500;
+
+    public static final double climberBottomPos = .5;
+    public static final double climberTopPos= -206;
 
     //climber PID constants
     public static final double cP = .000125;

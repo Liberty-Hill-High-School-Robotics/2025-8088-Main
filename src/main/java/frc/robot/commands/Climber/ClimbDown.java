@@ -1,6 +1,6 @@
 package frc.robot.commands.Climber;
-import frc.robot.subsystems.Climber;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Climber;
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}. Written explicitly for
@@ -33,6 +33,6 @@ public class ClimbDown extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return m_climber.climberAtBottomPos();
   }
 }
