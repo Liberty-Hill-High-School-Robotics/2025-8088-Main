@@ -85,7 +85,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
     NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
     NamedCommands.registerCommand("ElevatorDown", new ElevatorDownDefault(m_elevator));
-    NamedCommands.registerCommand("PlaceL1", new PlaceL1(m_coral));
+    NamedCommands.registerCommand("PlaceL1", new IntakeOut(m_coral));
     NamedCommands.registerCommand("CoralIn", new IntakeIn(m_coral));
 
     SmartDashboard.putData("p", new Align(m_drivesubsystem));

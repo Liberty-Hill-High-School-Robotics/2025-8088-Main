@@ -3,9 +3,12 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
-
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -14,7 +17,9 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,7 +53,7 @@ public class Vision extends SubsystemBase {
         // Check if the latest result has any targets.
         //GetLL Values
         if(Limelight.isConnected()){
-            var LLResult = Limelight.getLatestResult();
+            PhotonPipelineResult LLResult = Limelight.getLatestResult();
             // Get the current best target.
 
             if(LLResult.hasTargets()){
@@ -72,15 +77,52 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("TAGPOSEANGLE", LLtargetpose.getRotation().getAngle());
                 SmartDashboard.putNumber("LTagID", LLbesttarget.objDetectId);
 
+                // Construct PhotonPoseEstimator
+                PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, visionData.LLCAMERAOFFSET);
+                //set single target strategy
+                photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
+                //get pose
+                if(Limelight.getLatestResult().hasTargets()){
+                    EstimatedRobotPose photonPoseTracked = photonPoseEstimator.update(Limelight.getLatestResult()).get();
+                    //make adjusted pose
+                    Pose2d VisionPose = new Pose2d
+                    (photonPoseTracked.estimatedPose.getX(), photonPoseTracked.estimatedPose.getY(), m_gyro.getRotation2d());
+
+                    //send pose values to network tables
+                    SmartDashboard.putNumber("XPOSE", VisionPose.getX());
+                    SmartDashboard.putNumber("YPOSE", VisionPose.getY());
+                    //update field view on elastic
+                    m_field.setRobotPose(VisionPose);
+                    SmartDashboard.putData("Field", m_field);
+                }
 
 
+
+                /*
                 //get single tag result if it exists
                 Transform3d SinglePose = LLResult.getBestTarget().getBestCameraToTarget();
                 Pose3d FinalSinglePose = PhotonUtils.estimateFieldToRobotAprilTag(SinglePose, LLtargetpose, visionData.LLCAMERAOFFSET);
+                Pose2d FinalSinglePoseAdjusted = new Pose2d(FinalSinglePose.getX(), FinalSinglePose.getY(), m_gyro.getRotation2d());
                 double error = LLResult.getBestTarget().getPoseAmbiguity();
-                if(error <= .6){
+                
+
+                //override pose if multitag result exists
+                if(LLResult.getMultiTagResult().isPresent()){
+                    //get estimated
+                    Pose2d FinalMultiPose = photonPoseTracked.estimatedPose.toPose2d();
+                    //adjust estimated
+                    Pose2d AdjustedPose = new Pose2d(FinalMultiPose.getX(), FinalMultiPose.getY(), m_gyro.getRotation2d());
+                    //send estimated to field drawing
+                    System.out.println("INFO: MULTI-TAG EXISTS, UPDATING POSE");
+                    m_field.setRobotPose(AdjustedPose);
+                    //send pose to networktables
+                    SmartDashboard.putNumber("MT ERROR", LLResult.getMultiTagResult().get().estimatedPose.bestReprojErr);
+                    SmartDashboard.putNumber("XPOSE", FinalMultiPose.getX());
+                    SmartDashboard.putNumber("YPOSE", FinalMultiPose.getY());
+                }
+                else if(error <= .6){
                     System.out.println("INFO: SINGLE TAG RANGE < 2, UPDATING POSE");
-                    m_field.setRobotPose(FinalSinglePose.toPose2d());
+                    m_field.setRobotPose(FinalSinglePoseAdjusted);
                 }
                 else{
                     System.out.println("INFO: SINGLE TAG RANGE > 2, NOT UPDATING POSE");
@@ -88,17 +130,10 @@ public class Vision extends SubsystemBase {
                 SmartDashboard.putNumber("ST ERROR", error);
                 SmartDashboard.putNumber("XPOSE", FinalSinglePose.getX());
                 SmartDashboard.putNumber("YPOSE", FinalSinglePose.getY());
-            //override pose if multitag result exists
-            if(LLResult.getMultiTagResult().isPresent()){
-                Transform3d fieldToCamera = LLResult.getMultiTagResult().get().estimatedPose.best;
-                System.out.println("INFO: MULTI-TAG EXISTS, UPDATING POSE");
-                Pose2d multipose2D = new Pose2d(fieldToCamera.getX(), fieldToCamera.getY(), m_gyro.getRotation2d());
-                m_field.setRobotPose(multipose2D);
-                SmartDashboard.putNumber("MT ERROR", LLResult.getMultiTagResult().get().estimatedPose.bestReprojErr);
-                SmartDashboard.putNumber("XPOSE", multipose2D.getX());
-                SmartDashboard.putNumber("YPOSE", multipose2D.getY());
-            }
             SmartDashboard.putData("Field", m_field);
+            */
+
+            
             }
             else{
                 SmartDashboard.putBoolean("TARGET", false);

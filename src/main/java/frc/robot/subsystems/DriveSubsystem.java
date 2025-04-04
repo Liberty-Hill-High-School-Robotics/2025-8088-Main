@@ -291,6 +291,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.reset();
   }
 
+  public void invertHeading() {
+    m_gyro.setYaw(180);
+  }
+
   /**
    * Returns the heading of the robot.
    *

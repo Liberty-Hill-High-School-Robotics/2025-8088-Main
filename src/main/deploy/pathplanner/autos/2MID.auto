@@ -55,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "BOTTOMCYCLE3"
+                  "pathName": "MIDDLECYCLE3"
                 }
               },
               {
@@ -70,7 +70,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ElevatorL4Auto"
+            "name": "PlaceL1"
           }
         }
       ]

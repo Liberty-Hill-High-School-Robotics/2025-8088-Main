@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.5,
-        "y": 4.0
+        "x": 5.766428454176784,
+        "y": 3.878203756730078
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.880180921054691,
-        "y": 2.730879934215112
+        "x": 9.131003289473526,
+        "y": 1.7061677631555998
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.825,
-        "y": -0.367
+        "x": 1.6356907894735249,
+        "y": 0.6477796052608631
       },
       "prevControl": {
-        "x": 2.5497532894757438,
-        "y": 2.0814144736887963
+        "x": 3.360444078949267,
+        "y": 3.0961940789496496
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "FEED SLOW",
-      "minWaypointRelativePos": 0.8353658536585351,
+      "minWaypointRelativePos": 0.9634146341463371,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 0.5,
