@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import javax.xml.validation.SchemaFactory;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -33,6 +35,7 @@ import frc.robot.commands.Coral.PlaceL1;
 //Command importsx
 import frc.robot.commands.Drive.ZeroHeading;
 import frc.robot.commands.Drive.easyAlign;
+import frc.robot.commands.Drive.indexGyro;
 import frc.robot.commands.Elevator.ElevatorDownDefault;
 import frc.robot.commands.Elevator.ElevatorLevel;
 import frc.robot.commands.Elevator.ElevatorUp;
@@ -125,6 +128,12 @@ public class RobotContainer {
 
     //DriveSubsytem Exports
     SmartDashboard.putNumber("inception", SmartDashboard.getNumber("SDYaw", 0));
+
+    SmartDashboard.putData("GYRO0", new indexGyro(m_drivesubsystem, 0));
+    SmartDashboard.putData("GYRO90", new indexGyro(m_drivesubsystem, 90));
+    SmartDashboard.putData("GYRO180", new indexGyro(m_drivesubsystem, 180));
+    SmartDashboard.putData("GYRO270", new indexGyro(m_drivesubsystem, 270));
+    SmartDashboard.putData("GYRO360", new indexGyro(m_drivesubsystem, 360));
 
 
     //Elevator Exports

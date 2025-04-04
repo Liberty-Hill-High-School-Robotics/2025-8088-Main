@@ -95,7 +95,7 @@ public final class Constants {
     public static final double eD = 0;
 
     //down PID constants
-    public static final double ePd = 0.004;
+    public static final double ePd = 0.0125;
     public static final double eId = 0.001;
     public static final double eDd = 0;
     //encoder values for each setpoint, assuming bottom is 0

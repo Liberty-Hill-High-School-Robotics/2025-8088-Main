@@ -30,7 +30,6 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_robotContainer.m_drivesubsystem.zeroHeading();
     
   }
 
@@ -63,13 +62,16 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    /*
+    m_robotContainer.m_drivesubsystem.zeroHeading();
     var alliance = DriverStation.getAlliance();
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red){
       m_robotContainer.m_drivesubsystem.invertHeading();
     }
     else if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue){
-      m_robotContainer.m_drivesubsystem.zeroHeading();
+      m_robotContainer.m_drivesubsystem.initHeading();
     }
+    */
     
     
     /*

@@ -291,8 +291,16 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.reset();
   }
 
+  public void overrideHeading(double value) {
+    m_gyro.setYaw(value);
+  }
+
   public void invertHeading() {
-    m_gyro.setYaw(180);
+    m_gyro.setYaw(90);
+  }
+
+  public void initHeading() {
+    m_gyro.setYaw(-90);
   }
 
   /**
