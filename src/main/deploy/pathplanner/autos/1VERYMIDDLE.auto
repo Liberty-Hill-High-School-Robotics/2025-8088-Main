@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "VERYMIDDLESTART1"
@@ -13,13 +19,25 @@
         {
           "type": "named",
           "data": {
-            "name": "ElevatorL4Auto"
+            "name": "PlaceL1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MOVE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevatorDown"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "1",
   "choreoAuto": false
 }

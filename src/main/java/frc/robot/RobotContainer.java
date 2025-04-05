@@ -25,6 +25,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MotorSpeeds;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Align;
+import frc.robot.commands.AutoL1;
 import frc.robot.commands.AutoL4;
 import frc.robot.commands.Climber.ClimbDown;
 import frc.robot.commands.Climber.ClimbUp;
@@ -88,7 +89,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL4", new ElevatorLevel(m_elevator, MotorSpeeds.elevatorL4));
     NamedCommands.registerCommand("ElevatorL4Auto", new AutoL4(m_coral, m_elevator));
     NamedCommands.registerCommand("ElevatorDown", new ElevatorDownDefault(m_elevator));
-    NamedCommands.registerCommand("PlaceL1", new IntakeOut(m_coral));
+    NamedCommands.registerCommand("PlaceL1", new AutoL1(m_coral, m_elevator));
     NamedCommands.registerCommand("CoralIn", new IntakeIn(m_coral));
 
     SmartDashboard.putData("p", new Align(m_drivesubsystem));

@@ -102,7 +102,7 @@ public final class Constants {
     //top of elevator is around encoder count = -149.5
     //index to close to zero for faster drop (motors will fall the rest of the way to prevent damage)
     public static final double elevatorL0 = -1;
-    public static final double elevatorL1 = -20;
+    public static final double elevatorL1 = -15;
     public static final double elevatorL2 = -43;
     public static final double elevatorL3 = -88;
     public static final double elevatorL4 = -147.75;
@@ -111,7 +111,7 @@ public final class Constants {
     public static final double elevatorSpeedDown = .6;
 
     public static final double coralSpeed = -.075;
-    public static final double coralOutSpeed = -.1;
+    public static final double coralOutSpeed = -.3;
     public static final double coralBrakeSpeed = -.02;
 
     public static final double climberUpSpeed = 2500;
